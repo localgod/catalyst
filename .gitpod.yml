@@ -1,0 +1,25 @@
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: false
+    addComment: false
+    addBadge: true
+gitConfig:
+  alias.st: status
+tasks:
+  - before: |
+      ./setup.sh
+      cd slides && npm install
+    init: |
+      cd slides and npm run dev
+    command: "docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1"
+
+vscode:
+  extensions:
+    - jebbs.plantuml
+    - redhat.vscode-xml
+    - jock.svg
+    - DavidAnson.vscode-markdownlint
