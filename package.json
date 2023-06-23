@@ -1,0 +1,40 @@
+{
+    "name": "catalyst",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "build": "tsc",
+      "dev": "tsc --watch",
+      "lint": "eslint --ignore-path .gitignore --ext .mts .",
+      "lintfix": "eslint --ignore-path .gitignore --fix --ext .mts .",
+      "mdlint": "markdownlint '**/*.md' --ignore node_modules --disable MD033 MD013 MD041"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/3ShapeInternal/diagrams.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/3ShapeInternal/diagrams/issues"
+    },
+    "homepage": "https://github.com/3ShapeInternal/diagrams#readme",
+    "dependencies": {
+      "@types/xml2js": "^0.4.11",
+      "commander": "^11.0.0",
+      "cheerio": "^1.0.0-rc.12",
+      "html-entities": "^2.3.3",
+      "html-minifier-terser": "^7.2.0",
+      "plantuml-pipe": "^1.4.0",
+      "xml2js": "^0.6.0"
+    },
+    "devDependencies": {
+      "@types/html-minifier-terser": "^7.0.0",
+      "@types/node": "^20.1.0",
+      "@typescript-eslint/eslint-plugin": "^5.59.0",
+      "@typescript-eslint/parser": "^5.59.0",
+      "eslint": "latest",
+      "typescript": "latest"
+    }
+  }

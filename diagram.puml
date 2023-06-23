@@ -1,0 +1,13 @@
+@startuml ERP Integration Overview
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+scale 1.0
+title Input diagram
+System(AX, "Microsoft Dynamics AX", "ERP system") {
+    Container(AIF, "Application Integration Framework", "", "")
+}
+
+LAYOUT_TOP_DOWN()
+SHOW_LEGEND()
+@enduml

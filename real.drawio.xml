@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="confluence.3shape.com" modified="2023-06-23T14:04:07.499Z" agent="5.0 (Macintosh)"
+    version="20.1.4" etag="iw4LKt5oxPLuRSvTz1IG" type="atlas">
+    <mxAtlasLibraries />
+    <diagram
+        id="4CbLhsFba6ivxL0s0BVc" name="Page-1">
+        <mxGraphModel dx="1617" dy="761" grid="1"
+            gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0"
+            pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell
+                    id="0" />
+                <mxCell id="1" parent="0" />
+                <object placeholders="1"
+                    c4Name="dasdasd" c4Type="ffgfht" c4Description="t4t23q"
+                    label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;"
+                    id="KIIw8nlwMq5VYnrR5kYy-2">
+                    <mxCell
+                        style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1061B0;fontColor=#ffffff;align=center;arcSize=11;strokeColor=#0D5091;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];"
+                        vertex="1" parent="1">
+                        <mxGeometry x="-120" y="170" width="240"
+                            height="120" as="geometry" />
+                    </mxCell>
+                </object>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
