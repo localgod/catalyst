@@ -12,14 +12,14 @@
     },
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/3ShapeInternal/diagrams.git"
+      "url": "git+https://github.com/localgod/catalyst"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-      "url": "https://github.com/3ShapeInternal/diagrams/issues"
+      "url": "https://github.com/localgod/catalyst/issues"
     },
-    "homepage": "https://github.com/3ShapeInternal/diagrams#readme",
+    "homepage": "https://catalyst.mindfield.dk",
     "dependencies": {
       "@types/xml2js": "^0.4.11",
       "commander": "^11.0.0",
