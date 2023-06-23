@@ -36,18 +36,17 @@ image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
 
 Use code snippets and get the highlighting directly![^1]
 
-```ts {all|2|1-6|9|all}
-interface User {
-  id: number
-  firstName: string
-  lastName: string
-  role: string
-}
+```ts {all|0|1|2|3|all}
+const svgData = await puml2Svg('diagram.puml')
+const svg = new Svg()
+await svg.load(svgData)
+const data = await svg2mx(svg)
 
-function updateUser(id: number, update: User) {
-  const user = getUser(id)
-  const newUser = { ...user, ...update }
-  saveUser(id, newUser)
+try {
+  fs.writeFileSync('diagram.drawio', data)
+  fs.writeFileSync('diagram.svg', svgData)
+} catch (error) {
+  console.error('Error writing files:', error)
 }
 ```
 
