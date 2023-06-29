@@ -10,12 +10,21 @@ github:
 gitConfig:
   alias.st: status
 tasks:
-  - before: |
-      ./setup.sh
-      cd slides && npm install
-    init: |
-      cd slides and npm run dev
+  - name: Global dependencies
+    before: ./setup.sh
+  - name: Setup slides
+    init: cd slides && npm install
+  - name: Setup catalyst
+    init: npm install
+  - name: Start docker service
     command: "docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1"
+    openMode: tab-after
+  - name: Start slides service
+    command: cd slides and npm run dev
+    openMode: tab-after
+  - name: Start typecript service
+    command: npm run dev
+    openMode: tab-after
 
 vscode:
   extensions:
@@ -24,3 +33,4 @@ vscode:
     - jock.svg
     - DavidAnson.vscode-markdownlint
     - hediet.vscode-drawio
+    - usernamehw.errorlens
