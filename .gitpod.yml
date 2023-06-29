@@ -20,7 +20,7 @@ tasks:
     command: "docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1"
     openMode: tab-after
   - name: Start slides service
-    command: cd slides and npm run dev
+    command: cd slides && npm run dev
     openMode: tab-after
   - name: Start typecript service
     command: npm run dev
