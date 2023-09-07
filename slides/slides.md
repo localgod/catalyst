@@ -30,6 +30,36 @@ Diagram transformation
 ---
 layout: image-right
 image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
+src: ./pages/05-intro.md
+---
+
+---
+src: ./pages/06-purpose.md
+---
+
+---
+layout: image-right
+image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
+src: ./pages/07-keyfeatures.md
+---
+
+---
+layout: image-right
+image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
+src: ./pages/08-why.md
+---
+
+---
+layout: image-right
+image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
+src: ./pages/09-c4.md
+---
+
+
+
+---
+layout: image-right
+image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
 ---
 
 # Code

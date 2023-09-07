@@ -7,12 +7,12 @@ import { System } from './c4/System.mjs';
 class Mx {
     private doc: MxFile
 
-    private tags: Record<string, any> [] = [
+    private tags: Record<string, any>[] = [
         { MxGraphModel: 'mxGraphModel' },
         { MxCell: 'mxCell' },
         { MxGeometry: 'mxGeometry' },
         { MxFile: 'mxfile' },
-      ]
+    ]
 
     constructor(height: number, width: number) {
         const diagramHeight = Math.ceil(height);
@@ -71,15 +71,15 @@ class Mx {
 
     replaceKeysWithValue(records: Record<string, any>[], inputString: string): string {
         let outputString = inputString;
-      
+
         for (const record of records) {
-          Object.keys(record).forEach((key) => {
-            const regex = new RegExp(`\\b${key}\\b`, 'g');
-            outputString = outputString.replace(regex, record[key]);
-          });
+            Object.keys(record).forEach((key) => {
+                const regex = new RegExp(`\\b${key}\\b`, 'g');
+                outputString = outputString.replace(regex, record[key]);
+            });
         }
         return outputString;
-      }
+    }
 
     async generate(): Promise<string> {
         return this.replaceKeysWithValue(this.tags, (new xml2js.Builder({ headless: true }).buildObject(this.doc)).replaceAll('&amp;', '&'))
