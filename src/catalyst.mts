@@ -4,6 +4,7 @@ import { Mx } from './mx/Mx.mjs'
 import { MxGeometry } from "./mx/MxGeometry.mjs"
 import { Svg } from './svg/Svg.mjs'
 import { PlantUmlPipe } from "plantuml-pipe";
+import { PumlParser } from "./pumlParser.mjs";
 
 async function svg2mx(svg: Svg): Promise<string> {
   const output = new Mx(svg.getDocumentHeight(), svg.getDocumentWidth());
@@ -22,7 +23,7 @@ async function svg2mx(svg: Svg): Promise<string> {
           as: 'geometry',
         },
       };
-      console.log(element)
+      console.log(element?.text)
       await output.addMxC4Object(g, name, 'kurt', 'be awesome');
     }
   }
@@ -56,18 +57,25 @@ const program = new Command()
 program.description('An application for converting plantuml diagrams to draw.io xml')
 program.requiredOption('-i, --input <path>', 'path to input file')
 program.requiredOption('-o, --output <path>', 'path to output file')
-program.action(async () => {
-  const svg = new Svg()
-  const svgData = await puml2Svg('diagram.puml')
-  await svg.load(svgData)
-  const data = await svg2mx(svg)
-
-  try {
-    fs.writeFileSync('diagram.drawio', data);
-    fs.writeFileSync('diagram.svg', svgData);
-    console.log('File written successfully.');
-  } catch (error) {
-    console.error('Error writing file:', error);
+program.action(async (options) => {
+  if (fs.existsSync(options.input)) {
+    const svg = new Svg()
+    const puml = await fs.promises.readFile(options.input, 'utf-8')
+    const parser = new PumlParser(puml)
+    console.log(parser.parse())
+    const svgData = await puml2Svg(options.input)
+    await svg.load(svgData)
+    const data = await svg2mx(svg)
+  
+    try {
+      fs.writeFileSync(options.output, data);
+      // fs.writeFileSync('diagram.svg', svgData);
+      console.log('File written successfully.');
+    } catch (error) {
+      console.error('Error writing file:', error);
+    }
+  } else {
+    throw new Error('Input file does not exist')
   }
 })
 
