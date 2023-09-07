@@ -10,6 +10,11 @@ github:
 gitConfig:
   alias.st: status
 tasks:
+  - name: Setup fnm (Fast node manager)
+    before: curl -fsSL https://fnm.vercel.app/install | bash
+    init: |
+      source /home/gitpod/.bashrc
+      fnm install --latest
   - name: Global dependencies
     before: ./setup.sh
   - name: Setup slides
