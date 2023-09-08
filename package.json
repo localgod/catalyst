@@ -6,6 +6,7 @@
     "scripts": {
       "build": "tsc",
       "dev": "tsc --watch",
+      "exe": "node ./dist/catalyst.mjs -i diagram.puml -o output.drawio",
       "lint": "eslint --ignore-path .gitignore --ext .mts .",
       "lintfix": "eslint --ignore-path .gitignore --fix --ext .mts .",
       "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041"

@@ -5,7 +5,7 @@
 scale 1.0
 title Input diagram
 System(AX, "Microsoft Dynamics AX", "ERP system") {
-    Container(AIF, "Application Integration Framework", "", "")
+    Container(AIF, "Application Integration Framework", "", "", $tags=tytter)
 }
 
 LAYOUT_TOP_DOWN()
