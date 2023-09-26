@@ -4,19 +4,39 @@ import { Mx } from './mx/Mx.mjs'
 import { MxGeometry } from "./mx/MxGeometry.mjs"
 import { Svg } from './svg/Svg.mjs'
 import { PlantUmlPipe } from "plantuml-pipe"
-import { PumlParser, Element } from "./pumlParser.mjs"
+import { EntityParser } from "./EntityParser.mjs"
+import { EntityDescriptor } from "./EntityDescriptor.interface.mjs"
+import { EntityType } from "./EntityType.enum.mjs"
 
-async function svg2mx(svg: Svg, pumlElements: Element[]): Promise<string> {
+async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<string> {
+
   const output = new Mx(svg.getDocumentHeight(), svg.getDocumentWidth())
+
   const elements = svg.getElements()
+  // console.dir(pumlElements, { depth: null })
 
   for (const element of elements) {
+
     if (element.rect !== undefined && (element.$.id.startsWith('elem_') || element.$.id.startsWith('cluster_'))) {
+
       let alias: string = element.$.id.replace(/^elem_|^cluster_/, '');
       const rect = element.rect[0].$
-      const g = createGeometry(rect.height, rect.width, rect.x,rect.y)
-      const info = pumlElements.find(el => el.type == alias) as Element
-      await output.addMxC4Object(g, info.alias, info.label, info.description)
+      const g = createGeometry(rect.height, rect.width, rect.x, rect.y)
+      const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', alias)
+
+      switch (info.type) {
+        case EntityType.System:
+          await output.addMxC4System(g, info.alias, info.label, info.technology)
+          break
+        case EntityType.Container:
+          await output.addMxC4System(g, info.alias, info.label, info.technology) // TODO create container method
+          break
+        case EntityType.Component:
+          await output.addMxC4Component(g, info.alias, info.label, info.technology)
+          break
+        default:
+          break
+      }     
     }
   }
   return await output.generate()
@@ -64,7 +84,7 @@ program.action(async (options) => {
   if (fs.existsSync(options.input)) {
     const svg = new Svg()
     const puml = await fs.promises.readFile(options.input, 'utf-8')
-    const elements = new PumlParser(puml).parse()
+    const elements = new EntityParser().parse(puml)
     const svgData = await puml2Svg(options.input)
     await svg.load(svgData)
     const data = await svg2mx(svg, elements)

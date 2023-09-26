@@ -3,6 +3,7 @@ import { MxGeometry } from './MxGeometry.mjs';
 import { MxFile } from './MxFile.mjs';
 import { MxC4 } from './MxC4.mjs';
 import { System } from './c4/System.mjs';
+import { Component } from './c4/Component.mjs';
 
 class Mx {
     private doc: MxFile
@@ -47,7 +48,7 @@ class Mx {
         return this.doc.MxFile.diagram.MxGraphModel.root
     }
 
-    async addMxC4Object(geometry: MxGeometry, name: string, type?: string, description?: string): Promise<void> {
+    async addMxC4System(geometry: MxGeometry, name: string, type?: string, description?: string): Promise<void> {
         const t: MxC4 = {
             $: {
                 placeholders: 1,
@@ -59,6 +60,30 @@ class Mx {
             MxCell: {
                 $: {
                     style: System.style(),
+                    parent: "1",
+                    vertex: 1
+                },
+                MxGeometry: geometry
+            }
+        }
+
+        this.getRoot().object.push(t);
+    }
+
+
+
+    async addMxC4Component(geometry: MxGeometry, name: string, type?: string, description?: string): Promise<void> {
+        const t: MxC4 = {
+            $: {
+                placeholders: 1,
+                MxC4Name: name,
+                MxC4Type: type || '',
+                MxC4Description: description || '',
+                label: await Component.label()
+            },
+            MxCell: {
+                $: {
+                    style: Component.style(),
                     parent: "1",
                     vertex: 1
                 },
