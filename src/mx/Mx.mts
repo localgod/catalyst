@@ -1,9 +1,10 @@
 import xml2js from 'xml2js'
 import { MxGeometry } from './MxGeometry.mjs';
 import { MxFile } from './MxFile.mjs';
-import { MxC4 } from './MxC4.mjs';
+import { c4 } from './c4.interface.mjs';
 import { System } from './c4/System.mjs';
 import { Component } from './c4/Component.mjs';
+import { Container } from './c4/Container.mjs';
 
 class Mx {
     private doc: MxFile
@@ -48,42 +49,44 @@ class Mx {
         return this.doc.MxFile.diagram.MxGraphModel.root
     }
 
-    async addMxC4System(geometry: MxGeometry, name: string, type?: string, description?: string): Promise<void> {
-        const t: MxC4 = {
-            $: {
-                placeholders: 1,
-                MxC4Name: name,
-                MxC4Type: type || '',
-                MxC4Description: description || '',
-                label: await System.label()
-            },
-            MxCell: {
-                $: {
-                    style: System.style(),
-                    parent: "1",
-                    vertex: 1
-                },
-                MxGeometry: geometry
-            }
+    async addMxC4(geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
+
+        let c4Type = ''
+        let label = ''
+        let style = ''
+        switch (type) {
+            case 'System':
+                c4Type = 'System'
+                label = await System.label()
+                style = System.style()
+                break;
+            case 'Container':
+                c4Type = 'Container'
+                label = await Container.label()
+                style = Container.style()
+                break;
+            case 'Component':
+                c4Type = 'Component'
+                label = await Component.label()
+                style = Component.style()
+                break;
+
+            default:
+                break;
         }
 
-        this.getRoot().object.push(t);
-    }
-
-
-
-    async addMxC4Component(geometry: MxGeometry, name: string, type?: string, description?: string): Promise<void> {
-        const t: MxC4 = {
+        const t: c4 = {
             $: {
                 placeholders: 1,
-                MxC4Name: name,
-                MxC4Type: type || '',
-                MxC4Description: description || '',
-                label: await Component.label()
+                c4Name: name,
+                c4Type,
+                c4Technology: technology || '',
+                c4Description: description || '',
+                label
             },
             MxCell: {
                 $: {
-                    style: Component.style(),
+                    style,
                     parent: "1",
                     vertex: 1
                 },

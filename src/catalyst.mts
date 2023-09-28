@@ -26,13 +26,13 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<strin
 
       switch (info.type) {
         case EntityType.System:
-          await output.addMxC4System(g, info.alias, info.label, info.technology)
+          await output.addMxC4(g, 'System', info.label, info.technology, info.description)
           break
         case EntityType.Container:
-          await output.addMxC4System(g, info.alias, info.label, info.technology) // TODO create container method
+          await output.addMxC4(g, 'Container', info.label, info.technology, info.description)
           break
         case EntityType.Component:
-          await output.addMxC4Component(g, info.alias, info.label, info.technology)
+          await output.addMxC4(g, 'Component', info.label, info.technology, info.description)
           break
         default:
           break

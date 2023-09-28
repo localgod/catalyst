@@ -4,7 +4,7 @@
 
 scale 1.0
 title Input diagram
-System(AX, "Microsoft Dynamics AX", "ERP system", "This is awesome") {
+System(AX, "label", "technology", "description") {
     Container(AIF, "Application Integration Framework", "ERP service", "This is also awesome", $tags=tytter) {
         Component(END, "API endpoint", "ERP service", "This is also awesome", $tags=tytter)
     }
@@ -14,6 +14,13 @@ System(AX2, "Microsoft Dynamics AX", "ERP system", "This is awesome") {
         Component(END2, "API endpoint", "ERP service", "This is also awesome", $tags=tytter)
     }
 }
+
+System(AX3, "Microsoft Dynamics AX", "ERP system", "This is awesome") {
+
+        Component(END3, "API endpoint", "ERP service", "This is also awesome", $tags=tytter)
+    
+}
+
 
 LAYOUT_TOP_DOWN()
 SHOW_LEGEND()

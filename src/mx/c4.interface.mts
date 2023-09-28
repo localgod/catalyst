@@ -1,10 +1,11 @@
 import { MxCell } from './MxCell.mjs';
 
-export interface MxC4 {
+export interface c4 {
     $: {
-        MxC4Name: string;
-        MxC4Type?: string;
-        MxC4Description?: string;
+        c4Name: string;
+        c4Type?: string;
+        c4Technology?: string;
+        c4Description?: string;
         label?: string;
         placeholders?: number;
         type?: string;

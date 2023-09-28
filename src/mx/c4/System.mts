@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio';
 
 class System {
     static async label() {
-        const template = `<div>%MxC4Name%</div><div>[%MxC4Type%]</div><div>%MxC4Description%</div>`;
+        const template = `<div>%c4Name%</div><div>[%c4Type%:%c4Technology%]</div><div>%c4Description%</div>`;
         const $ = cheerio.load(template, {}, false);
         $('div:eq(0)').attr('style', 'font-size:16px;font-weight:bold;')
         $('div:eq(2)').attr('style', 'font-size:11px;color:#cccccc;')
@@ -20,11 +20,11 @@ class System {
             fillColor: '#1061B0',
             fontColor: '#ffffff',
             align: 'center',
+            verticalAlign:'top',
             arcSize: 10,
             strokeColor: '#0D5091',
             metaEdit: 1,
-            resizable: 0,
-            points: '[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]]'
+            resizable: 1
         }
 
         return Object.entries(styles).map(([key, value]) => `${key}=${value}`).join(';');

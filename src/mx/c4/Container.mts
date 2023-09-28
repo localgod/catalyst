@@ -2,7 +2,7 @@ import { encode } from 'html-entities'
 import { minify } from 'html-minifier-terser'
 import * as cheerio from 'cheerio';
 
-class Component {
+class Container {
     static async label() {
         const template = `<div>%c4Name%</div><div>[%c4Type%:%c4Technology%]</div><div>%c4Description%</div>`;
         const $ = cheerio.load(template, {}, false);
@@ -11,19 +11,19 @@ class Component {
         const minifiedHtml = await minify($.html(), { collapseWhitespace: true });
         return encode(minifiedHtml);
     }
-
     static style() {
         const styles: Record<string, any> = {
             rounded: 1,
             whiteSpace: 'wrap',
             html: 1,
+            fontZize: 11,
             labelBackgroundColor: 'none',
-            fillColor: '#63BEF2',
+            fillColor: '#23A2D9',
             fontColor: '#ffffff',
             align: 'center',
             verticalAlign:'top',
-            arcSize: 6,
-            strokeColor: '#2086C9',
+            arcSize: 10,
+            strokeColor: '#0E7DAD',
             metaEdit: 1,
             resizable: 1
         }
@@ -32,4 +32,4 @@ class Component {
     }
 }
 
-export { Component }
+export { Container }
