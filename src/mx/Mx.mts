@@ -1,13 +1,14 @@
 import xml2js from 'xml2js'
-import { MxGeometry } from './MxGeometry.mjs';
-import { MxFile } from './MxFile.mjs';
-import { c4 } from './c4.interface.mjs';
+import { MxGeometry } from './MxGeometry.interface.mjs';
+import { MxFile } from './MxFile.interface.mjs';
+import { c4 } from './c4/c4.interface.mjs';
 import { System } from './c4/System.mjs';
 import { Component } from './c4/Component.mjs';
 import { Container } from './c4/Container.mjs';
+import { Relastionship } from './c4/Relationship.mjs';
 
 class Mx {
-    private doc: MxFile
+    doc: MxFile
 
     private tags: Record<string, any>[] = [
         { MxGraphModel: 'mxGraphModel' },
@@ -97,6 +98,32 @@ class Mx {
         this.getRoot().object.push(t);
     }
 
+    async addMxC4Relationship(geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
+
+           const t: c4 = {
+            $: {
+                placeholders: 1,
+                c4Name: name,
+                c4Type: 'Relationship',
+                c4Technology: technology || '',
+                c4Description: description || '',
+                label: await Relastionship.label()
+            },
+            MxCell: {
+                $: {
+                    style: Relastionship.style(),
+                    parent: "1",
+                    edge: 1,
+                    source: 7,
+                    target: 4
+                },
+                MxGeometry: geometry
+            }
+        }     
+
+        this.getRoot().object.push(t);
+    }
+
     replaceKeysWithValue(records: Record<string, any>[], inputString: string): string {
         let outputString = inputString;
 
@@ -114,4 +141,4 @@ class Mx {
     }
 }
 
-export { Mx, MxGeometry }
+export { Mx, MxGeometry, Relastionship, System, Component, Container }

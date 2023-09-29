@@ -1,4 +1,4 @@
-import { MxCell } from './MxCell.mjs';
+import { MxCell } from '../MxCell.interface.mjs';
 
 export interface c4 {
     $: {

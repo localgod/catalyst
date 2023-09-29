@@ -1,6 +1,6 @@
 import xml2js from 'xml2js'
 
-class Svg {
+export class Svg {
     svg: string
     document: { svg: { $: { viewBox: string }, g: { g: [] }[] } }
 
@@ -21,4 +21,3 @@ class Svg {
         return this.document.svg.g[0].g
     }
 }
-export { Svg }

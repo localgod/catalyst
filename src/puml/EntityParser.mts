@@ -81,7 +81,6 @@ class EntityParser {
     return this.createHierarchy(result);
   }
 
-
   private createHierarchy(systems: EntityDescriptor[]): EntityDescriptor[] {
     const result: EntityDescriptor[] = [];
 
@@ -121,4 +120,4 @@ class EntityParser {
   }
 }
 
-export { EntityParser }
+export { EntityParser, EntityDescriptor, EntityType }
