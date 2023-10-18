@@ -1,6 +1,6 @@
 ---
 theme: seriph
-background: https://source.unsplash.com/cPccYbPrF-A/1920x1080
+background: https://images.unsplash.com/photo-1695456261833-3794ab617deb
 class: text-center
 highlighter: shiki
 lineNumbers: false
@@ -29,77 +29,44 @@ Diagram transformation
 
 ---
 layout: image-right
-image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
-src: ./pages/05-intro.md
+image: https://plus.unsplash.com/premium_photo-1675344576121-81e305536fd3
+src: ./pages/01-intro.md
 ---
 
 ---
-src: ./pages/06-purpose.md
----
-
----
-layout: image-right
-image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
-src: ./pages/07-keyfeatures.md
+layout: default
+src: ./pages/02-purpose.md
 ---
 
 ---
 layout: image-right
-image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
-src: ./pages/08-why.md
+image: https://images.unsplash.com/photo-1604661808622-639387f6f698
+src: ./pages/03-why.md
 ---
 
 ---
 layout: image-right
-image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
-src: ./pages/09-c4.md
----
-
-
-
----
-layout: image-right
-image: https://source.unsplash.com/_lqTChNy0dk/1920x1080
----
-
-# Code
-
-Use code snippets and get the highlighting directly![^1]
-
-```ts {all|0|1|2|3|all}
-const svgData = await puml2Svg('diagram.puml')
-const svg = new Svg()
-await svg.load(svgData)
-const data = await svg2mx(svg)
-
-try {
-  fs.writeFileSync('diagram.drawio', data)
-  fs.writeFileSync('diagram.svg', svgData)
-} catch (error) {
-  console.error('Error writing files:', error)
-}
-```
-
-<arrow v-click="3" x1="400" y1="420" x2="230" y2="330" color="#564" width="3" arrowSize="1" />
-
-[^1]: [Learn More](https://sli.dev/guide/syntax.html#line-highlighting)
-
-<style>
-.footnotes-sep {
-  @apply mt-20 opacity-10;
-}
-.footnotes {
-  @apply text-sm opacity-75;
-}
-.footnote-backref {
-  display: none;
-}
-</style>
-
----
-src: ./pages/02-requirements.md
+image: https://images.unsplash.com/photo-1524741978410-350ba91a70d7
+src: ./pages/04-keyfeatures.md
 ---
 
 ---
-src: ./pages/01-diagrams.md
+layout: default
+src: ./pages/05-requirements.md
 ---
+
+---
+layout: default
+src: ./pages/06-diagrams.md
+---
+
+---
+layout: default
+src: ./pages/07-code.md
+---
+
+---
+layout: default
+src: ./pages/08-transformation.md
+---
+
