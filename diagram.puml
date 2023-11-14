@@ -1,6 +1,5 @@
 @startuml ERP Integration Overview
-!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include ./C4_Component.puml
 
 scale 1.0
 title Input diagram

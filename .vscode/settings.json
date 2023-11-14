@@ -1,0 +1,12 @@
+{
+    "plantuml.render": "PlantUMLServer",
+    "plantuml.server": "http://127.0.0.1:8080",
+    "plantuml.jarArgs": [
+        "-DRELATIVE_INCLUDE=."
+    ],
+    "editor.renderWhitespace": "all",
+    "editor.renderControlCharacters": true,
+    "files.insertFinalNewline": true,
+    "code-eol.highlightNonDefault": true,
+    "code-eol.highlightExtraWhitespace": true
+}

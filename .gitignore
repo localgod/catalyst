@@ -2,3 +2,4 @@ node_modules
 dist
 output.drawio
 diagram.svg
+C4_Component.puml
