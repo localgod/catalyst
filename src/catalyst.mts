@@ -4,6 +4,7 @@ import { PlantUmlPipe } from "plantuml-pipe"
 import { EntityParser, EntityDescriptor, EntityType } from "./puml/EntityParser.mjs"
 import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { Svg } from './svg/Svg.mjs'
+import { RelParser } from './puml/RelParser.mjs'
 
 async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<string> {
   const mx = new Mx(svg.getDocumentHeight(), svg.getDocumentWidth())
@@ -16,52 +17,36 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<strin
       let alias: string = element.$.id.replace(/^elem_|^cluster_/, '');
       const rect = element.rect[0].$
       const g = createGeometry(rect.height, rect.width, rect.x, rect.y)
+
       const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', alias)
 
       switch (info.type) {
         case EntityType.System:
-          await mx.addMxC4(g, 'System', info.label, info.technology, info.description)
+          await mx.addMxC4(alias, g, 'System', info.label, info.technology, info.description)
           break
         case EntityType.Container:
-          await mx.addMxC4(g, 'Container', info.label, info.technology, info.description)
+          await mx.addMxC4(alias, g, 'Container', info.label, info.technology, info.description)
           break
         case EntityType.Component:
-          await mx.addMxC4(g, 'Component', info.label, info.technology, info.description)
+          await mx.addMxC4(alias, g, 'Component', info.label, info.technology, info.description)
           break
         default:
           break
       }
     }
+
+    if (element.path !== undefined && element.$.id.startsWith('link_')) {
+       const info = new RelParser(element)
+       await mx.addMxC4Relationship(info.getpath(), info.getFrom(), info.getTo(), 'Relationship', 'tech', 'benny')
+       // console.dir(info.getpath(), { depth:null})
+    }
   }
-  mx.addMxC4Relationship(createLine(240, { x: 370, y: 370 }, { x: 630, y: 220 }), 'name', 'tech', 'description')
-  console.dir(mx.doc, { depth: null }) //Hardcode for testing, not working yet
+
+  //console.dir(mx.doc, { depth: null }) //Hardcode for testing, not working yet
   return await mx.generate()
 }
 
-function createLine(width: number, source: { x: number, y: number }, target: { x: number, y: number }): MxGeometry {
-  return {
-    $: {
-      width: Math.ceil(width),
-      as: 'geometry',
-    },
-    mxPoint: [
-      {
-        $: {
-          x: Math.ceil(source.x),
-          y: Math.ceil(source.y),
-          as: 'sourcePoint',
-        }
-      },
-      {
-        $: {
-          x: Math.ceil(target.x),
-          y: Math.ceil(target.y),
-          as: 'targetPoint',
-        }
-      }
-    ]
-  }
-}
+
 
 function createGeometry(height: number, width: number, x: number, y: number): MxGeometry {
   return {

@@ -12,7 +12,6 @@ class RelParser {
     getpath(): MxGeometry {
         const g: MxGeometry = { $: { as: "geometry" }, mxPoint: [], Array: { $: { as: "points" }, mxPoint: [] } }
         let points = this.parsePoints()
-        console.log(points)
         points = this.approximateLine(points, this.MAX_LINE_POINTS)
         const sourcePoint: MxPoint = { $: { x: points[0][0], y: points[0][1], as: 'sourcePoint' } }
         const targetPoint: MxPoint = { $: { x: points[points.length - 1][0], y: points[points.length - 1][1], as: 'targetPoint' } }
@@ -28,7 +27,6 @@ class RelParser {
 
 
     approximateLine(points, numPoints) {
-        console.log(points.length)
         if (numPoints < 2 || numPoints > points.length) {
             return points
         }
