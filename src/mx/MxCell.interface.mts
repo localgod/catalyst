@@ -5,8 +5,8 @@ export interface MxCell {
         id?: string;
         style?: string;
         parent?: string;
-        source?: number;
-        target?: number;
+        source?: string;
+        target?: string;
         edge?: number;
         vertex?: number;
     };

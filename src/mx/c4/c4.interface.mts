@@ -11,7 +11,7 @@ export interface c4 {
         type?: string;
         factSheetType?: string;
         factSheetId?: string;
-        id?: number;
+        id?: string;
     };
     MxCell: MxCell;
 }

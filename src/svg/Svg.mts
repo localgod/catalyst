@@ -17,7 +17,7 @@ export class Svg {
         return parseInt(this.document.svg.$.viewBox.split(' ')[2])
     }
 
-    getElements(): { $: { id: string }, text?: {}[], rect?: {} }[] {
+    getElements(): { $: { id: string }, text?: {}[], rect?: {}, path?: {} }[] {
         return this.document.svg.g[0].g
     }
 }

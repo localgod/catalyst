@@ -50,7 +50,7 @@ class Mx {
         return this.doc.MxFile.diagram.MxGraphModel.root
     }
 
-    async addMxC4(geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
+    async addMxC4(alias:string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
 
         let c4Type = ''
         let label = ''
@@ -83,7 +83,8 @@ class Mx {
                 c4Type,
                 c4Technology: technology || '',
                 c4Description: description || '',
-                label
+                label,
+                id: alias
             },
             MxCell: {
                 $: {
@@ -98,13 +99,13 @@ class Mx {
         this.getRoot().object.push(t);
     }
 
-    async addMxC4Relationship(geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
+    async addMxC4Relationship(geometry: MxGeometry, source: string, target:string, type: string, name: string, technology?: string, description?: string): Promise<void> {
 
            const t: c4 = {
             $: {
                 placeholders: 1,
                 c4Name: name,
-                c4Type: 'Relationship',
+                c4Type: type,
                 c4Technology: technology || '',
                 c4Description: description || '',
                 label: await Relastionship.label()
@@ -114,12 +115,12 @@ class Mx {
                     style: Relastionship.style(),
                     parent: "1",
                     edge: 1,
-                    source: 7,
-                    target: 4
+                    source,
+                    target
                 },
                 MxGeometry: geometry
             }
-        }     
+        }
 
         this.getRoot().object.push(t);
     }

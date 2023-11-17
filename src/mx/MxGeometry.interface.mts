@@ -9,4 +9,8 @@ export interface MxGeometry {
         as: string;
     };
     mxPoint?: MxPoint[];
+    Array?: {
+        $?: { as?: string };
+        mxPoint?: MxPoint[]
+    };
 }
