@@ -8,7 +8,7 @@ import { RelParser } from './puml/RelParser.mjs'
 
 async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<string> {
   const mx = new Mx(svg.getDocumentHeight(), svg.getDocumentWidth())
-  const elements = svg.getElements()
+  const elements = svg.getGroups()
 
   for (const element of elements) {
 

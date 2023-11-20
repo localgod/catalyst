@@ -1,6 +1,33 @@
 import xml2js from 'xml2js'
 
-export class Svg {
+
+interface rect {
+    $: {
+        height?: number
+        width?: number
+    }
+}
+
+interface text {
+    $: {}
+}
+
+interface path {
+    $: {
+        d:string
+    }
+}
+
+interface g {
+    $: {
+        id:string
+    }
+    rect?: rect[]
+    text?:text[]
+    path?:path
+}
+
+class Svg {
     svg: string
     document: { svg: { $: { viewBox: string }, g: { g: [] }[] } }
 
@@ -17,7 +44,9 @@ export class Svg {
         return parseInt(this.document.svg.$.viewBox.split(' ')[2])
     }
 
-    getElements(): { $: { id: string }, text?: {}[], rect?: {}, path?: {} }[] {
+    getGroups(): g[] {
         return this.document.svg.g[0].g
     }
 }
+
+export { rect, text, path, g, Svg }
