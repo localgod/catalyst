@@ -1,7 +1,7 @@
 import fs, { PathLike } from 'fs'
 import { Command } from 'commander'
 import { PlantUmlPipe } from "plantuml-pipe"
-import { EntityParser, EntityDescriptor, EntityType } from "./puml/EntityParser.mjs"
+import { EntityParser, EntityDescriptor } from "./puml/EntityParser.mjs"
 import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { Svg } from './svg/Svg.mjs'
 import { RelParser } from './puml/RelParser.mjs'
@@ -16,18 +16,17 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<strin
 
       let alias: string = element.$.id.replace(/^elem_|^cluster_/, '');
       const rect = element.rect[0].$
-      const g = createGeometry(rect.height, rect.width, rect.x, rect.y)
-
+      const g = new MxGeometry(rect.height, rect.width, rect.x, rect.y)
       const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', alias)
 
       switch (info.type) {
-        case EntityType.System:
+        case 'System':
           await mx.addMxC4(alias, g, 'System', info.label, info.technology, info.description)
           break
-        case EntityType.Container:
+        case 'Container':
           await mx.addMxC4(alias, g, 'Container', info.label, info.technology, info.description)
           break
-        case EntityType.Component:
+        case 'Component':
           await mx.addMxC4(alias, g, 'Component', info.label, info.technology, info.description)
           break
         default:
@@ -38,26 +37,10 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<strin
     if (element.path !== undefined && element.$.id.startsWith('link_')) {
        const info = new RelParser(element)
        await mx.addMxC4Relationship(info.getpath(), info.getFrom(), info.getTo(), 'Relationship', 'tech', 'benny')
-       // console.dir(info.getpath(), { depth:null})
     }
   }
 
-  //console.dir(mx.doc, { depth: null }) //Hardcode for testing, not working yet
   return await mx.generate()
-}
-
-
-
-function createGeometry(height: number, width: number, x: number, y: number): MxGeometry {
-  return {
-    $: {
-      height: Math.ceil(height),
-      width: Math.ceil(width),
-      x: Math.ceil(x),
-      y: Math.ceil(y),
-      as: 'geometry',
-    }
-  }
 }
 
 async function puml2Svg(path: PathLike): Promise<string> {

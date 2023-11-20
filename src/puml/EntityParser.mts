@@ -1,7 +1,31 @@
-import { EntityType } from './EntityType.enum.mjs'
 import { EntityDescriptor } from './EntityDescriptor.interface.mjs'
 
 class EntityParser {
+
+  private isValidEntityType(type: string): boolean {
+    return [
+      'Person',
+      'Person_Ext',
+      'System',
+      'SystemDb',
+      'SystemQueue',
+      'System_Ext',
+      'SystemDb_Ext',
+      'SystemQueue_Ext',
+      'Container',
+      'ContainerDb',
+      'ContainerQueue',
+      'Container_Ext',
+      'ContainerDb_Ext',
+      'ContainerQueue_Ext',
+      'Component',
+      'ComponentDb',
+      'ComponentQueue',
+      'Component_Ext',
+      'ComponentDb_Ext',
+      'ComponentQueue_Ext',
+    ].indexOf(type) !== -1 ? true : false
+  }
 
   private isComponent(str: string): boolean {
     return str.match(/^(?!Rel\b|UpdateElementStyle\b|UpdateSystemBoundaryStyle\b|AddRelTag\b|AddElementTag\b|scale\b|title\b|LAYOUT_TOP_DOWN\b|SHOW_LEGEND\b|[@!]).*$/) === null;
@@ -16,9 +40,13 @@ class EntityParser {
       return null;
     }
 
+    if(!this.isValidEntityType(block.match(matchNode)![1])) {
+      return null
+    }
+
     const result: EntityDescriptor = {
       parent,
-      type: block.match(matchNode)![1] as EntityType,
+      type: block.match(matchNode)![1],
       alias: props[0],
       label: props[1],
     };
@@ -107,7 +135,7 @@ class EntityParser {
       if (item[propertyToFind] === valueToFind) {
         return item; // Found the object with the specified property and value in the current item
       }
-  
+
       if (item.children && item.children.length > 0) {
         const objectInChildren = this.getObjectWithPropertyAndValueInHierarchy(item.children, propertyToFind, valueToFind);
         if (objectInChildren !== undefined) {
@@ -115,9 +143,9 @@ class EntityParser {
         }
       }
     }
-  
+
     return undefined; // Property with the specified value not found in this branch of the hierarchy
   }
 }
 
-export { EntityParser, EntityDescriptor, EntityType }
+export { EntityParser, EntityDescriptor }

@@ -8,6 +8,8 @@ drawings:
   persist: false
 transition: slide-left
 title: Welcome to Catalyst
+favicon: 'logo.svg'
+author: 'Johannes Skov Frandsen'
 ---
 
 # Welcome to Catalyst

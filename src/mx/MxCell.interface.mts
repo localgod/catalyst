@@ -1,4 +1,4 @@
-import { MxGeometry } from './MxGeometry.interface.mjs';
+import { MxGeometry } from './MxGeometry.mjs';
 
 export interface MxCell {
     $: {

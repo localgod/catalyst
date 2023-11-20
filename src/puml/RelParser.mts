@@ -1,5 +1,5 @@
-import { MxGeometry } from "../mx/MxGeometry.interface.mjs"
-import { MxPoint } from "../mx/MxPoint.interface.mjs"
+import { MxGeometry } from "../mx/MxGeometry.mjs"
+import { MxPoint } from "../mx/MxPoint.mjs"
 
 class RelParser {
     readonly MAX_LINE_POINTS = 4
@@ -10,23 +10,20 @@ class RelParser {
     }
 
     getpath(): MxGeometry {
-        const g: MxGeometry = { $: { as: "geometry" }, mxPoint: [], Array: { $: { as: "points" }, mxPoint: [] } }
+        const geometry: MxGeometry = new MxGeometry()
         let points = this.parsePoints()
         points = this.approximateLine(points, this.MAX_LINE_POINTS)
-        const sourcePoint: MxPoint = { $: { x: points[0][0], y: points[0][1], as: 'sourcePoint' } }
-        const targetPoint: MxPoint = { $: { x: points[points.length - 1][0], y: points[points.length - 1][1], as: 'targetPoint' } }
-        g.mxPoint.push(sourcePoint)
-        g.mxPoint.push(targetPoint)
+        geometry.addPoint(new MxPoint(points[0][0], points[0][1], 'sourcePoint'))
+        geometry.addPoint(new MxPoint(points[points.length - 1][0], points[points.length - 1][1], 'targetPoint'))
         points.forEach((elm, index) => {
-            if (index !== 0 && index !== points.length -1) {
-                g.Array.mxPoint.push({ $: { x: elm[0], y: elm[1] } })
+            if (index !== 0 && index !== points.length - 1) {
+                geometry.addArrayPoint({ $: { x: elm[0], y: elm[1] } })
             }
         })
-        return g
+        return geometry
     }
 
-
-    approximateLine(points, numPoints) {
+    private approximateLine(points, numPoints) {
         if (numPoints < 2 || numPoints > points.length) {
             return points
         }

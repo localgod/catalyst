@@ -1,5 +1,5 @@
 import xml2js from 'xml2js'
-import { MxGeometry } from './MxGeometry.interface.mjs';
+import { MxGeometry } from './MxGeometry.mjs';
 import { MxFile } from './MxFile.interface.mjs';
 import { c4 } from './c4/c4.interface.mjs';
 import { System } from './c4/System.mjs';
@@ -30,8 +30,6 @@ class Mx {
                 diagram: {
                     MxGraphModel: {
                         $: {
-                            dx: 1815,
-                            dy: 751,
                             pageHeight: diagramHeight,
                             pageWidth: diagramWidth
                         },
@@ -44,7 +42,6 @@ class Mx {
             }
         }
     }
-
 
     private getRoot() {
         return this.doc.MxFile.diagram.MxGraphModel.root
