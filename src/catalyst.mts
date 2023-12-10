@@ -6,7 +6,7 @@ import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { Svg } from './svg/Svg.mjs'
 import { RelParser } from './puml/RelParser.mjs'
 
-async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<string> {
+async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string }[]): Promise<string> {
   const mx = new Mx(svg.getDocumentHeight(), svg.getDocumentWidth())
   const elements = svg.getGroups()
 
@@ -35,8 +35,16 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[]): Promise<strin
     }
 
     if (element.path !== undefined && element.$.id.startsWith('link_')) {
-       const info = new RelParser(element)
-       await mx.addMxC4Relationship(info.getpath(), info.getFrom(), info.getTo(), 'Relationship', 'tech', 'benny')
+      const from = element.$.id.replace(/^link_/, '').split('_')[0]
+      const to = element.$.id.replace(/^link_/, '').split('_')[1]
+      const rel = pumlRelations.filter((rel) => {
+        if (rel.source === from && rel.target === to) {
+          return rel
+        }
+      }
+      )[0]
+      const info = new RelParser(element)
+      await mx.addMxC4Relationship(info.getpath(), info.getFrom(), info.getTo(), 'Relationship', rel.label, rel.description)
     }
   }
 
@@ -74,9 +82,11 @@ program.action(async (options) => {
     const svg = new Svg()
     const puml = await fs.promises.readFile(options.input, 'utf-8')
     const elements = new EntityParser().parse(puml)
+    const relations = RelParser.getRelations(puml)
+
     const svgData = await puml2Svg(options.input)
     await svg.load(svgData)
-    const data = await svg2mx(svg, elements)
+    const data = await svg2mx(svg, elements, relations)
 
     try {
       fs.writeFileSync(options.output, data)

@@ -19,9 +19,9 @@ System(AX3, "Microsoft Dynamics AX", "ERP system", "This is awesome") {
     Component(END3, "API endpoint", "ERP service", "This is also awesome", $tags=tytter)
 }
 
-Rel(END, END2, "Label Relation", "Technology relation")
+Rel(END, END2, "Label Relation 1", "Technology relation 1")
 
-Rel(AIF, END2, "Label Relation", "Technology relation")
+Rel(AIF, END3, "Label Relation 2", "Technology relation 2")
 
 
 
