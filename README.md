@@ -17,6 +17,19 @@ The following dependencies needs to be available on the system:
 - [Graphviz](https://graphviz.org)
 - [NodeJS](https://nodejs.org)
 
+## Try it out
+
+- Checkout this repo
+- Run `npm install` to install dependencies
+- Run `npm run dev` to start typescript compiler
+- Run `npm run exec` to test catalyst with the provided demo file `diagram.puml`
+
+The output is written to `output.drawio`.
+
+You may try to make changes to `diagram.puml` to see how catalyst behaves or you
+may call catalyst directly like this:
+`node ./dist/catalyst.mjs -i input.puml -o output.drawio`
+
 ## Purpose
 
 ### Bridging Standards
