@@ -1,4 +1,4 @@
-import xml2js from 'xml2js'
+import { parseStringPromise } from 'xml2js'
 
 
 interface rect {
@@ -33,7 +33,7 @@ class Svg {
 
     async load(svg: string): Promise<void> {
         this.svg = svg
-        this.document = await xml2js.parseStringPromise(this.svg)
+        this.document = await parseStringPromise(this.svg)
     }
 
     getDocumentHeight(): number {
