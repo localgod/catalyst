@@ -14,6 +14,7 @@ System(ERP, "Ernterprise Resource Mananagement", "ERP system") {
 
 <div>
 <h3>Rendered output</h3>
+
 ```plantuml {scale: 0.7}
 @startuml ERP Integration Overview
 !includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
@@ -30,7 +31,6 @@ System(ERP, "Ernterprise Resource Mananagement", "ERP system") {
 LAYOUT_TOP_DOWN()
 SHOW_LEGEND()
 @enduml
-
 ```
 
 </div>
