@@ -22,17 +22,17 @@
     },
     "homepage": "https://catalyst.mindfield.dk",
     "dependencies": {
-        "@types/xml2js": "^0.4.12",
         "cheerio": "^1.0.0-rc.12",
         "commander": "^12.0.0",
-        "html-entities": "^2.4.0",
+        "html-entities": "^2.5.2",
         "html-minifier-terser": "^7.2.0",
-        "plantuml-pipe": "^1.5.0",
-        "unsplash-js": "^7.0.18",
+        "plantuml-pipe": "^1.6.0",
+        "unsplash-js": "^7.0.19",
         "xml2js": "^0.6.2"
     },
     "devDependencies": {
-        "@types/html-minifier-terser": "^7.0.0",
+        "@types/xml2js": "^0.4.14",
+        "@types/html-minifier-terser": "^7.0.2",
         "@types/node": "^20.5.9",
         "@typescript-eslint/eslint-plugin": "^7.3.0",
         "@typescript-eslint/parser": "^7.2.0",
