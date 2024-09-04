@@ -9,7 +9,7 @@ interface rect {
 }
 
 interface text {
-    $: {}
+    $: object
 }
 
 interface path {

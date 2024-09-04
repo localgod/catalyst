@@ -26,24 +26,24 @@ class MxGeometry  {
     }
 
     addPoint(point: MxPoint): void {
-        // @ts-ignore
+        // @ts-expect-error mxpoint might not exists on MxGeometry
         if (this.mxPoint === undefined) {
-            // @ts-ignore
+            // @ts-expect-error mxpoint might not exists on MxGeometry
             this.mxPoint = []
         }
-        // @ts-ignore
+        // @ts-expect-error mxpoint might not exists on MxGeometry
         this.mxPoint as any
-        // @ts-ignore
+        // @ts-expect-error mxpoint might not exists on MxGeometry
         this.mxPoint.push(point)
     }
 
     addArrayPoint(point: MxPoint): void {
-        // @ts-ignore
+        // @ts-expect-error Array might not exists on MxGeometry
         if (this.Array === undefined) {
-            // @ts-ignore
+            // @ts-expect-error Array might not exists on MxGeometry
             this.Array = { $: { as: 'points' }, mxPoint: [] }
         }
-        // @ts-ignore
+        // @ts-expect-error Array might not exists on MxGeometry
         this.Array.mxPoint.push(point)
     }
 }

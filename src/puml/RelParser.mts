@@ -14,7 +14,7 @@ interface ParsedCoordinates {
 class RelParser {
     private rel: { $?: { id?: string }, path?: { $?: { d?: string } }[] }
     private points: [][]
-    constructor(rel: {}) {
+    constructor(rel: object) {
         this.rel = rel
     }
 

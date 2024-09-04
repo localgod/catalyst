@@ -14,7 +14,7 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[], pumlRelations:
 
       if (element.rect !== undefined && (element.$.id.startsWith('elem_') || element.$.id.startsWith('cluster_'))) {
 
-        let alias: string = element.$.id.replace(/^elem_|^cluster_/, '');
+        const alias: string = element.$.id.replace(/^elem_|^cluster_/, '');
         const rect: { height?: number, width?: number, x?: number, y?: number } = element.rect[0].$
         const g = new MxGeometry(rect.height, rect.width, rect.x, rect.y)
         const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', alias)

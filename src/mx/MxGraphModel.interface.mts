@@ -7,6 +7,6 @@ export interface MxGraphModel {
     };
     root: {
         MxCell?: MxCell[];
-        object?: {}[];
+        object?: object[];
     };
 }

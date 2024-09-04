@@ -7,8 +7,8 @@
         "build": "tsc",
         "dev": "tsc --watch",
         "exec": "node ./dist/catalyst.mjs -i diagram.puml -o output.drawio",
-        "lint": "eslint --ignore-path .gitignore --ext .mts .",
-        "lintfix": "eslint --ignore-path .gitignore --fix --ext .mts .",
+        "lint": "eslint ./src",
+        "lintfix": "eslint --fix ./src",
         "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041"
     },
     "repository": {
@@ -31,11 +31,12 @@
         "xml2js": "^0.6.2"
     },
     "devDependencies": {
-        "@types/xml2js": "^0.4.14",
+        "@eslint/js": "^9.9.1",
         "@types/html-minifier-terser": "^7.0.2",
         "@types/node": "^22.0.0",
-        "@typescript-eslint/eslint-plugin": "^8.0.0",
-        "@typescript-eslint/parser": "^8.0.0",
-        "eslint": "latest"
+        "@types/xml2js": "^0.4.14",
+        "eslint": "^9.9.1",
+        "globals": "^15.9.0",
+        "typescript-eslint": "^8.4.0"
     }
 }
