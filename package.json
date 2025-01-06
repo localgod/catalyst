@@ -23,7 +23,7 @@
     "homepage": "https://catalyst.mindfield.dk",
     "dependencies": {
         "cheerio": "^1.0.0-rc.12",
-        "commander": "^12.0.0",
+        "commander": "^13.0.0",
         "html-entities": "^2.5.2",
         "html-minifier-terser": "^7.2.0",
         "plantuml-pipe": "^1.6.0",
