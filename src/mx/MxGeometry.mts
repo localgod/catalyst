@@ -32,8 +32,6 @@ class MxGeometry  {
             this.mxPoint = []
         }
         // @ts-expect-error mxpoint might not exists on MxGeometry
-        this.mxPoint as any
-        // @ts-expect-error mxpoint might not exists on MxGeometry
         this.mxPoint.push(point)
     }
 

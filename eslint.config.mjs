@@ -1,19 +1,11 @@
+import js from "@eslint/js";
 import globals from "globals";
-import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
+import { defineConfig } from "eslint/config";
 
 
-export default [
-  {
-    files: ["**/*.{js,mjs,mts}"]
-  },
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    rules: {
-      "@typescript-eslint/no-unused-expressions": "off",
-      "@typescript-eslint/no-explicit-any": "off"
-    }
-  }
-];
+export default defineConfig([
+  { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], plugins: { js }, extends: ["js/recommended"] },
+  { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], languageOptions: { globals: globals.node } },
+  tseslint.configs.recommended,
+]);

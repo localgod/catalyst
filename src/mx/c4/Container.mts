@@ -12,7 +12,7 @@ class Container {
         return encode(minifiedHtml);
     }
     static style() {
-        const styles: Record<string, any> = {
+        const styles: Record<string, unknown> = {
             rounded: 1,
             whiteSpace: 'wrap',
             html: 1,

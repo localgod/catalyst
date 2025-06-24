@@ -1,7 +1,7 @@
 import xml2js from 'xml2js'
 import { MxGeometry } from './MxGeometry.mjs';
-import { MxFile } from './MxFile.interface.mjs';
-import { c4 } from './c4/c4.interface.mjs';
+import type { MxFile } from './MxFile.interface.mjs';
+import type { c4 } from './c4/c4.interface.mjs';
 import { System } from './c4/System.mjs';
 import { Component } from './c4/Component.mjs';
 import { Container } from './c4/Container.mjs';
@@ -10,7 +10,7 @@ import { Relastionship } from './c4/Relationship.mjs';
 class Mx {
     doc: MxFile
 
-    private tags: Record<string, any>[] = [
+    private tags: Record<string, unknown>[] = [
         { MxGraphModel: 'mxGraphModel' },
         { MxCell: 'mxCell' },
         { MxGeometry: 'mxGeometry' },
@@ -47,7 +47,7 @@ class Mx {
         return this.doc.MxFile.diagram.MxGraphModel.root
     }
 
-    async addMxC4(alias:string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
+    async addMxC4(alias: string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
 
         let c4Type = ''
         let label = ''
@@ -93,12 +93,13 @@ class Mx {
             }
         }
 
-        this.getRoot().object.push(t);
+        const object = this.getRoot().object ?? []
+        object.push(t);
     }
 
-    async addMxC4Relationship(geometry: MxGeometry, source: string, target:string, type: string, name: string, technology?: string, description?: string): Promise<void> {
+    async addMxC4Relationship(geometry: MxGeometry, source: string, target: string, type: string, name: string, technology?: string, description?: string): Promise<void> {
 
-           const t: c4 = {
+        const t: c4 = {
             $: {
                 placeholders: 1,
                 c4Name: name,
@@ -119,16 +120,17 @@ class Mx {
             }
         }
 
-        this.getRoot().object.push(t);
+        const object = this.getRoot().object ?? []
+        object.push(t);
     }
 
-    replaceKeysWithValue(records: Record<string, any>[], inputString: string): string {
+    replaceKeysWithValue(records: Record<string, unknown>[], inputString: string): string {
         let outputString = inputString;
 
         for (const record of records) {
-            Object.keys(record).forEach((key) => {
+            Object.keys(record).forEach((key: string) => {
                 const regex = new RegExp(`\\b${key}\\b`, 'g');
-                outputString = outputString.replace(regex, record[key]);
+                outputString = outputString.replace(regex, record[key] as string);
             });
         }
         return outputString;

@@ -24,19 +24,19 @@
     "dependencies": {
         "cheerio": "^1.0.0-rc.12",
         "commander": "^14.0.0",
-        "html-entities": "^2.5.2",
+        "html-entities": "^2.6.0",
         "html-minifier-terser": "^7.2.0",
         "plantuml-pipe": "^1.6.0",
         "unsplash-js": "^7.0.19",
         "xml2js": "^0.6.2"
     },
     "devDependencies": {
-        "@eslint/js": "^9.9.1",
+        "@eslint/js": "^9.29.0",
         "@types/html-minifier-terser": "^7.0.2",
         "@types/node": "^24.0.1",
         "@types/xml2js": "^0.4.14",
-        "eslint": "^9.9.1",
-        "globals": "^16.0.0",
-        "typescript-eslint": "^8.4.0"
+        "eslint": "^9.29.0",
+        "globals": "^16.2.0",
+        "typescript-eslint": "^8.35.0"
     }
 }

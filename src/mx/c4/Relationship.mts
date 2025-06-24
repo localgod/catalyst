@@ -14,7 +14,7 @@ class Relastionship {
     }
 
     static style() {
-        const styles: Record<string, any> = {
+        const styles: Record<string, unknown> = {
             endArrow: 'blockThin',
             html: 1,
             fontSize: 10,

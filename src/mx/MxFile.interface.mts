@@ -1,4 +1,4 @@
-import { MxGraphModel } from './MxGraphModel.interface.mjs';
+import type { MxGraphModel } from './MxGraphModel.interface.mjs';
 
 export interface MxFile {
     MxFile: {

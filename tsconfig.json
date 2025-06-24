@@ -1,18 +1,29 @@
 {
-    "compilerOptions": {
-        "target": "es2022",
-        "module": "esnext",
-        "lib": [
-            "ES2022",
-            "DOM"
-        ],
-        "outDir": "./dist",
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "moduleResolution": "Node",
-        "resolveJsonModule": true,
-    },
-    "include": [
-        "./**/*"
-    ]
+  "typeScriptVersion": "5.8.3",
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2024",
+    "module": "esnext",
+    "lib": [
+      "ES2024",
+      "DOM"
+    ],
+    "outDir": "./dist",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "./**/*"
+  ]
 }

@@ -1,4 +1,4 @@
-import { EntityDescriptor } from './EntityDescriptor.interface.mjs'
+import type { EntityDescriptor } from './EntityDescriptor.interface.mjs'
 
 class EntityParser {
 
@@ -130,7 +130,7 @@ class EntityParser {
     return result;
   }
 
-  getObjectWithPropertyAndValueInHierarchy(data: EntityDescriptor[], propertyToFind: string, valueToFind: any): EntityDescriptor | undefined {
+  getObjectWithPropertyAndValueInHierarchy(data: EntityDescriptor[], propertyToFind: string, valueToFind: unknown): EntityDescriptor | undefined {
     for (const item of data) {
       if (item[propertyToFind] === valueToFind) {
         return item; // Found the object with the specified property and value in the current item

@@ -31,6 +31,11 @@ class Svg {
     svg: string
     document: { svg: { $: { viewBox: string }, g: { g: [] }[] } }
 
+    constructor(){
+        this.svg = ''
+        this.document = { svg: { $: { viewBox: '' }, g: [] } }
+    }
+
     async load(svg: string): Promise<void> {
         this.svg = svg
         this.document = await parseStringPromise(this.svg)
