@@ -1,6 +1,8 @@
  #!/usr/bin/env bash
 
-docker pull plantuml/plantuml-server:jetty-v1.2023.12
+TAG=jetty-v1.2025.3
+
+docker pull plantuml/plantuml-server:${TAG}
 sudo apt-get -q -y update
 sudo apt-get -q -y install graphviz
 npm install --location=global npm@latest typescript@latest markdownlint-cli@latest
