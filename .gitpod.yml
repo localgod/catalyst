@@ -1,26 +1,31 @@
 gitConfig:
   alias.st: status
+
 tasks:
-  - name: Setup fnm (Fast node manager)
-    before: curl -fsSL https://fnm.vercel.app/install | bash
+  - name: Setup Environment
     init: |
+      bash ./setup.sh
       source /home/gitpod/.bashrc
       fnm install --latest
-  - name: Global dependencies
-    before: ./setup.sh
-  - name: Setup slides
-    init: cd slides && npm install
-  - name: Setup catalyst
-    init: npm install
-  - name: Start docker service
+
+  - name: Install Dependencies
+    init: |
+      npm install
+      cd slides && npm install
+
+  - name: Start Docker Service
     command: "docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1"
     openMode: tab-after
-  - name: Start slides service
+
+  - name: Start Slides Service
     command: cd slides && npm run dev
     openMode: tab-after
-  - name: Start typecript service
+
+  - name: Start Typescript Service
     command: npm run dev
     openMode: tab-after
+    env:
+      NODE_ENV: development
 
 vscode:
   extensions:

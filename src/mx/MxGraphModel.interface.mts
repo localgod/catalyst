@@ -1,4 +1,4 @@
-import { MxCell } from './MxCell.interface.mjs';
+import type { MxCell } from './MxCell.interface.mjs';
 
 export interface MxGraphModel {
     $?: {

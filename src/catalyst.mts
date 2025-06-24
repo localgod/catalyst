@@ -19,18 +19,20 @@ async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[], pumlRelations:
         const g = new MxGeometry(rect.height, rect.width, rect.x, rect.y)
         const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', alias)
 
-        switch (info.type) {
-          case 'System':
-            await mx.addMxC4(alias, g, 'System', info.label, info.technology, info.description)
-            break
-          case 'Container':
-            await mx.addMxC4(alias, g, 'Container', info.label, info.technology, info.description)
-            break
-          case 'Component':
-            await mx.addMxC4(alias, g, 'Component', info.label, info.technology, info.description)
-            break
-          default:
-            break
+        if (info) {
+          switch (info.type) {
+            case 'System':
+              await mx.addMxC4(alias, g, 'System', info.label, info.technology, info.description)
+              break
+            case 'Container':
+              await mx.addMxC4(alias, g, 'Container', info.label, info.technology, info.description)
+              break
+            case 'Component':
+              await mx.addMxC4(alias, g, 'Component', info.label, info.technology, info.description)
+              break
+            default:
+              break
+          }
         }
       }
 
@@ -72,7 +74,7 @@ async function puml2Svg(path: PathLike): Promise<string> {
       resolve()
     })
   })
-  console.log(data)
+
   return data
 }
 

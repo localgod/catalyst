@@ -1,4 +1,5 @@
 interface EntityDescriptor {
+  [key: string]: unknown;
   parent?: string;
   type: string;
   alias: string;
