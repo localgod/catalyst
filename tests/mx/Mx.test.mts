@@ -50,16 +50,16 @@ describe('Mx', () => {
 
   it('should create Mx instance with correct dimensions', () => {
     expect(mx).toBeInstanceOf(Mx);
-    expect(mx.doc.MxFile.diagram.MxGraphModel.$.pageHeight).toBe(800);
-    expect(mx.doc.MxFile.diagram.MxGraphModel.$.pageWidth).toBe(600);
+    expect(mx.doc.MxFile.diagram.MxGraphModel.$?.pageHeight).toBe(800);
+    expect(mx.doc.MxFile.diagram.MxGraphModel.$?.pageWidth).toBe(600);
   });
 
   it('should initialize with default MxCells', () => {
     const cells = mx.doc.MxFile.diagram.MxGraphModel.root.MxCell;
     expect(cells).toHaveLength(2);
-    expect(cells[0].$.id).toBe('0');
-    expect(cells[1].$.id).toBe('1');
-    expect(cells[1].$.parent).toBe('0');
+    expect(cells?.[0].$.id).toBe('0');
+    expect(cells?.[1].$.id).toBe('1');
+    expect(cells?.[1].$.parent).toBe('0');
   });
 
   it('should add System C4 element', async () => {
@@ -67,9 +67,9 @@ describe('Mx', () => {
     
     const objects = mx.doc.MxFile.diagram.MxGraphModel.root.object;
     expect(objects).toHaveLength(1);
-    expect(objects[0].$.c4Type).toBe('System');
-    expect(objects[0].$.c4Name).toBe('Test System');
-    expect(objects[0].$.id).toBe('test-system');
+    expect((objects?.[0] as any)?.$.c4Type).toBe('System');
+    expect((objects?.[0] as any)?.$.c4Name).toBe('Test System');
+    expect((objects?.[0] as any)?.$.id).toBe('test-system');
   });
 
   it('should add Container C4 element', async () => {
@@ -77,8 +77,8 @@ describe('Mx', () => {
     
     const objects = mx.doc.MxFile.diagram.MxGraphModel.root.object;
     expect(objects).toHaveLength(1);
-    expect(objects[0].$.c4Type).toBe('Container');
-    expect(objects[0].$.c4Name).toBe('Test Container');
+    expect((objects?.[0] as any)?.$.c4Type).toBe('Container');
+    expect((objects?.[0] as any)?.$.c4Name).toBe('Test Container');
   });
 
   it('should add Component C4 element', async () => {
@@ -86,8 +86,8 @@ describe('Mx', () => {
     
     const objects = mx.doc.MxFile.diagram.MxGraphModel.root.object;
     expect(objects).toHaveLength(1);
-    expect(objects[0].$.c4Type).toBe('Component');
-    expect(objects[0].$.c4Name).toBe('Test Component');
+    expect((objects?.[0] as any)?.$.c4Type).toBe('Component');
+    expect((objects?.[0] as any)?.$.c4Name).toBe('Test Component');
   });
 
   it('should add C4 relationship', async () => {
@@ -95,10 +95,10 @@ describe('Mx', () => {
     
     const objects = mx.doc.MxFile.diagram.MxGraphModel.root.object;
     expect(objects).toHaveLength(1);
-    expect(objects[0].$.c4Type).toBe('Relationship');
-    expect(objects[0].$.c4Name).toBe('Uses');
-    expect(objects[0].MxCell.$.source).toBe('source-id');
-    expect(objects[0].MxCell.$.target).toBe('target-id');
+    expect((objects?.[0] as any)?.$.c4Type).toBe('Relationship');
+    expect((objects?.[0] as any)?.$.c4Name).toBe('Uses');
+    expect((objects?.[0] as any)?.MxCell.$.source).toBe('source-id');
+    expect((objects?.[0] as any)?.MxCell.$.target).toBe('target-id');
   });
 
   it('should replace keys with values', () => {
@@ -124,6 +124,6 @@ describe('Mx', () => {
     
     const objects = mx.doc.MxFile.diagram.MxGraphModel.root.object;
     expect(objects).toHaveLength(1);
-    expect(objects[0].$.c4Type).toBe('');
+    expect((objects?.[0] as any)?.$.c4Type).toBe('');
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Svg } from '../../src/svg/Svg.mjs';
 
 // Mock xml2js
@@ -87,7 +87,7 @@ describe('Svg', () => {
     svg.document = {
       svg: {
         $: { viewBox: '0 0 800 600' },
-        g: [{ g: mockGroups }]
+        g: [{ g: mockGroups as any }]
       }
     };
 

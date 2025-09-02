@@ -12,9 +12,9 @@ vi.mock('html-minifier-terser', () => ({
 
 vi.mock('cheerio', () => ({
   load: vi.fn(() => {
-    const mockCheerio = vi.fn((selector) => ({
+    const mockCheerio = vi.fn((selector: any) => ({
       attr: vi.fn()
-    }));
+    })) as any;
     mockCheerio.html = vi.fn(() => '<div>test</div>');
     return mockCheerio;
   })

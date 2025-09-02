@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 class System {
     static async label() {
         const template = `<div>%c4Name%</div><div>[%c4Type%:%c4Technology%]</div><div>%c4Description%</div>`;
-        const $ = cheerio.load(template, {}, false);
+        const $ = cheerio.load(template, {});
         $('div:eq(0)').attr('style', 'font-size:16px;font-weight:bold;')
         $('div:eq(2)').attr('style', 'font-size:11px;color:#cccccc;')
         const minifiedHtml = await minify($.html(), { collapseWhitespace: true });

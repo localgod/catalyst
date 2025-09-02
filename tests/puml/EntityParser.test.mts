@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { EntityParser } from '../../src/puml/EntityParser.mjs';
 import type { EntityDescriptor } from '../../src/puml/EntityDescriptor.interface.mjs';
 
