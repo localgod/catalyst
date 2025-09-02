@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 class Relastionship {
     static async label() {
         const template = `<div><div>%c4Description%</div><div>[%c4Technology%]</div></div>`;
-        const $ = cheerio.load(template, {}, false);
+        const $ = cheerio.load(template, {});
         $('div:eq(0)').attr('style', 'text-align: left;')
         $('div:eq(1)').attr('style', 'text-align: center;font-weight:bold;')
         $('div:eq(2)').attr('style', 'text-align: center')

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Container } from '../../../src/mx/c4/Container.mjs';
+import { System } from '../../../src/mx/c4/System.mjs';
 
 // Mock dependencies
 vi.mock('html-entities', () => ({
@@ -12,31 +12,31 @@ vi.mock('html-minifier-terser', () => ({
 
 vi.mock('cheerio', () => ({
   load: vi.fn(() => {
-    const mockCheerio = vi.fn((selector) => ({
+    const mockCheerio = vi.fn((selector: any) => ({
       attr: vi.fn()
-    }));
+    })) as any;
     mockCheerio.html = vi.fn(() => '<div>test</div>');
     return mockCheerio;
   })
 }));
 
-describe('Container', () => {
+describe('System', () => {
   it('should generate label with proper HTML structure', async () => {
-    const label = await Container.label();
+    const label = await System.label();
     
     expect(label).toContain('encoded:');
     expect(label).toContain('minified:');
   });
 
   it('should generate style string with correct properties', () => {
-    const style = Container.style();
+    const style = System.style();
     
     expect(style).toContain('rounded=1');
     expect(style).toContain('whiteSpace=wrap');
     expect(style).toContain('html=1');
-    expect(style).toContain('fillColor=#23A2D9');
+    expect(style).toContain('fillColor=#1061B0');
     expect(style).toContain('fontColor=#ffffff');
-    expect(style).toContain('strokeColor=#0E7DAD');
+    expect(style).toContain('strokeColor=#0D5091');
     expect(style).toContain('align=center');
     expect(style).toContain('verticalAlign=top');
     expect(style).toContain('arcSize=10');
@@ -45,7 +45,7 @@ describe('Container', () => {
   });
 
   it('should format style as semicolon-separated key=value pairs', () => {
-    const style = Container.style();
+    const style = System.style();
     const parts = style.split(';');
     
     expect(parts.length).toBeGreaterThan(5);
@@ -56,16 +56,10 @@ describe('Container', () => {
     });
   });
 
-  it('should have specific Container colors', () => {
-    const style = Container.style();
+  it('should have specific System colors', () => {
+    const style = System.style();
     
-    expect(style).toContain('fillColor=#23A2D9');
-    expect(style).toContain('strokeColor=#0E7DAD');
-  });
-
-  it('should include fontZize property (typo in original)', () => {
-    const style = Container.style();
-    
-    expect(style).toContain('fontZize=11');
+    expect(style).toContain('fillColor=#1061B0');
+    expect(style).toContain('strokeColor=#0D5091');
   });
 });
