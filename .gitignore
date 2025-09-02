@@ -3,3 +3,4 @@ dist
 output.drawio
 diagram.svg
 C4*.puml
+coverage
