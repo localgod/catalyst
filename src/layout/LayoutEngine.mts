@@ -1,6 +1,17 @@
 import dagre from '@dagrejs/dagre'
 import { EntityDescriptor } from '../puml/EntityDescriptor.interface.mjs'
 
+interface DagreNode {
+  x: number
+  y: number
+  width: number
+  height: number
+  label?: string
+  type?: string
+  technology?: string
+  description?: string
+}
+
 interface LayoutNode {
   id: string
   width: number
@@ -215,7 +226,7 @@ class LayoutEngine {
 
     // Collect positioned leaf nodes
     this.graph.nodes().forEach(nodeId => {
-      const node = this.graph.node(nodeId) as any
+      const node = this.graph.node(nodeId) as DagreNode
       
       if (node && node.x !== undefined && node.y !== undefined) {
         const layoutNode: LayoutNode = {
@@ -312,7 +323,6 @@ class LayoutEngine {
     }
 
     // Calculate bounds needed for all containers and their components
-    let totalContentWidth = 0
     let totalContentHeight = 0
     let maxContainerWidth = 0
 

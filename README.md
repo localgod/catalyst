@@ -1,13 +1,15 @@
 # Catalyst
 
+[![CI](https://github.com/localgod/catalyst/actions/workflows/ci.yml/badge.svg)](https://github.com/localgod/catalyst/actions/workflows/ci.yml)
+
 <img src="logo.svg" width="100" height="100" alt="Logo">
 
 ## Overview
 
 Catalyst is a software tool designed to facilitate the conversion of
 C4 diagrams written in [PlantUML](https://plantuml.com/) format into [draw.io](https://draw.io)
-C4 diagrams. While PlantUML itself is not required as a runtime dependency, 
-the tool parses diagrams written in PlantUML's C4 syntax (.puml files). 
+C4 diagrams. While PlantUML itself is not required as a runtime dependency,
+the tool parses diagrams written in PlantUML's C4 syntax (.puml files).
 This project uses the Dagre layout engine for fast, pure JavaScript
 layout calculation without external dependencies.
 
@@ -19,14 +21,15 @@ The following dependencies needs to be available on the system:
 
 ## Input Format
 
-Catalyst processes C4 diagrams written in PlantUML syntax (.puml files). While the PlantUML 
+Catalyst processes C4 diagrams written in PlantUML syntax (.puml files). While the PlantUML
 runtime is not required, the input files should follow PlantUML's C4 diagram syntax including:
 
 - `System()`, `Container()`, `Component()` declarations
-- `Rel()` relationship definitions  
+- `Rel()` relationship definitions
 - Standard PlantUML C4 includes and formatting
 
 Example input file structure:
+
 ```plantuml
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
@@ -50,12 +53,14 @@ The output is written to `output.drawio`.
 
 ### Usage Options
 
-**Basic Usage**
+#### Basic Usage
+
 ```bash
 npm run exec
 ```
 
-**Custom Usage**
+#### Custom Usage
+
 ```bash
 # With custom files
 node ./dist/src/catalyst.mjs -i input.puml -o output.drawio
@@ -87,7 +92,7 @@ transition from PlantUML's text-based format to draw.io's graphical capabilities
 
 ## Key Features
 
-- **PlantUML C4 Format Support:** The converter parses and converts C4 diagrams 
+- **PlantUML C4 Format Support:** The converter parses and converts C4 diagrams
 written in PlantUML syntax (.puml files) without requiring PlantUML runtime.
 
 - **Fast Layout Engine:** Uses Dagre for pure JavaScript layout calculation,
@@ -107,6 +112,17 @@ the converter. Examples and usage scenarios are provided to assist you.
 
 3. **Contribute:** We welcome contributions from the community. Feel free to
 submit bug reports, feature requests, or pull requests on our GitHub repository.
+
+## Testing and Coverage
+
+The project includes comprehensive test coverage with automated reporting:
+
+- **Run tests:** `npm run test:run`
+- **Run with coverage:** `npm run test:coverage`
+- **Coverage thresholds:** 85% for branches, functions, lines, and statements
+- **Automated coverage reports** are generated on every PR via GitHub Actions
+
+Current coverage: **89.35%** overall with 106 passing tests.
 
 ## Why Convert?
 

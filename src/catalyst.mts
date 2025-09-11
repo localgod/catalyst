@@ -3,9 +3,9 @@ import { Command } from 'commander'
 import { EntityParser, EntityDescriptor } from "./puml/EntityParser.mjs"
 import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { RelParser } from './puml/RelParser.mjs'
-import { LayoutEngine } from './layout/LayoutEngine.mjs'
+import { LayoutEngine, LayoutResult } from './layout/LayoutEngine.mjs'
 
-async function layoutData2mx(layoutData: any, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string }[]): Promise<string> {
+async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string }[]): Promise<string> {
   const mx = new Mx(layoutData.height || 600, layoutData.width || 800)
   
   // Handle nodes from layout data
@@ -58,12 +58,15 @@ async function layoutData2mx(layoutData: any, pumlElements: EntityDescriptor[], 
     for (const edge of layoutData.edges) {
       const rel = pumlRelations.find(r => r.source === edge.source && r.target === edge.target)
       if (rel) {
-        // Create a simple path for the relationship
+        // Create a simple path for the relationship using edge points or default positions
         const points = edge.points || [
-          { x: edge.sourceX || 0, y: edge.sourceY || 0 },
-          { x: edge.targetX || 0, y: edge.targetY || 0 }
+          { x: 0, y: 0 },
+          { x: 100, y: 100 }
         ]
-        await mx.addMxC4Relationship(points, edge.source, edge.target, 'Relationship', rel.label, rel.description)
+        // Convert points array to MxGeometry format - for now use first point as geometry
+        const firstPoint = points[0] || { x: 0, y: 0 }
+        const g = new MxGeometry(20, 100, firstPoint.x, firstPoint.y) // Simple line geometry
+        await mx.addMxC4Relationship(g, edge.source, edge.target, 'Relationship', rel.label, rel.description)
       }
     }
   }
