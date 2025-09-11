@@ -1,8 +1,14 @@
 # Requirements
 
-- [Java Rutime environement (JRE)](https://openjdk.org)
-- [Graphviz](https://graphviz.org)
-- [Nodejs](https://nodejs.org)
+- [Node.js](https://nodejs.org) (only runtime dependency)
+
+## Input Format
+
+Catalyst processes C4 diagrams written in PlantUML syntax (.puml files). While the PlantUML runtime is not required, the input files should follow PlantUML's C4 diagram syntax including:
+
+- `System()`, `Container()`, `Component()` declarations
+- `Rel()` relationship definitions  
+- Standard PlantUML C4 includes and formatting
 
 ## Commandline
 
@@ -14,3 +20,4 @@ Catalyst is a commandline tool to support:
   workflows for efficient data processing.
 - ***Remote Access***: Command line tools are perfect for remote management and
   headless machines.
+- ***No External Dependencies***: Pure JavaScript implementation eliminates Java/Graphviz requirements.

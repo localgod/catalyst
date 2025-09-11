@@ -27,7 +27,7 @@ interface LayoutResult {
   height: number
 }
 
-class DagreLayoutEngine {
+class LayoutEngine {
   private graph: dagre.graphlib.Graph
   private clusters: Map<string, LayoutNode> = new Map()
   private nodeHierarchy: Map<string, string[]> = new Map()
@@ -80,7 +80,7 @@ class DagreLayoutEngine {
   }
 
   /**
-   * Add nodes from parsed PlantUML entities with hierarchical support
+   * Add nodes from parsed C4 entities with hierarchical support
    */
   addNodes(entities: EntityDescriptor[]): void {
     const addNodeRecursively = (entity: EntityDescriptor, parentId?: string) => {
@@ -125,7 +125,7 @@ class DagreLayoutEngine {
   }
 
   /**
-   * Add edges from parsed PlantUML relations
+   * Add edges from parsed C4 relations
    */
   addEdges(relations: { source: string; target: string; label: string; description: string }[]): void {
     relations.forEach(relation => {
@@ -430,7 +430,7 @@ class DagreLayoutEngine {
     const containerPadding = this.getContainerTextPadding('Container')
     
     // Start positioning after container text area + additional clearance
-    const textClearance = 40 // Additional space after container text to match PlantUML spacing
+    const textClearance = 40 // Additional space after container text for proper visual spacing
     let currentY = (containerNode.y || 0) - (containerNode.height / 2) + containerPadding.top + textClearance
     
     childrenIds.forEach(childId => {
@@ -458,6 +458,34 @@ class DagreLayoutEngine {
     const currentGraph = this.graph.graph()
     this.graph.setGraph({ ...currentGraph, ...options })
   }
+
+  /**
+   * Static factory method to create a layout engine and calculate layout for given entities and relations
+   */
+  static async calculateLayout(
+    entities: EntityDescriptor[],
+    relations: Array<{ source: string; target: string; label: string; description: string }>,
+    options?: {
+      rankdir?: 'TB' | 'BT' | 'LR' | 'RL'
+      align?: 'UL' | 'UR' | 'DL' | 'DR'
+      nodesep?: number
+      edgesep?: number
+      ranksep?: number
+      marginx?: number
+      marginy?: number
+    }
+  ): Promise<LayoutResult> {
+    const layoutEngine = new LayoutEngine()
+    
+    if (options) {
+      layoutEngine.setLayoutOptions(options)
+    }
+    
+    layoutEngine.addNodes(entities)
+    layoutEngine.addEdges(relations)
+    
+    return layoutEngine.calculateLayout()
+  }
 }
 
-export { DagreLayoutEngine, LayoutResult, LayoutNode, LayoutEdge }
+export { LayoutEngine, LayoutResult, LayoutNode, LayoutEdge }

@@ -25,7 +25,7 @@ class RelParser {
         // Define the regular expression pattern to match relations
         const relationPattern = /Rel\(([^,]+),\s*([^,]+),\s*"([^"]+)",\s*"([^"]+)"\)/g;
 
-        // Find all matches of relations in the PlantUML string
+        // Find all matches of relations in the C4 diagram string
         let match;
         while ((match = relationPattern.exec(pumlString)) !== null) {
             const source = match[1].trim();

@@ -6,17 +6,18 @@
 How do use...
 
 ```bash {all|0|1|2-9|11}
-$ node ./dist/catalyst.mjs -h
+$ node ./dist/src/catalyst.mjs -h
 Usage: catalyst [options]
 
-An application for converting plantuml diagrams to draw.io xml
+An application for converting C4 diagrams to draw.io xml using Dagre layout engine
 
 Options:
-  -i, --input <path>   path to input file
-  -o, --output <path>  path to output file
-  -h, --help           display help for command
+  -i, --input <path>                    path to input file
+  -o, --output <path>                   path to output file
+  --layout-direction <direction>        layout direction (TB, BT, LR, RL) (default: "TB")
+  -h, --help                           display help for command
 
-$ node ./dist/catalyst.mjs -i diagram.puml -o output.drawio
+$ node ./dist/src/catalyst.mjs -i diagram.puml -o output.drawio
 ```
 
 <style>

@@ -4,12 +4,12 @@
 @startuml
 Actor user as USER
 participant     Catalyst     as CA
-participant     PlantUml     as PL
+participant     "Dagre Layout Engine"     as DL
 USER -> CA: Execute catalyst
-CA -> CA: Parse puml in to internal JSON representation
-CA -> PL: Send puml to plantuml
-return svg representation of the diagram
-CA -> CA: Convert internal json to drawio xml using positioning and size information from svg output. 
+CA -> CA: Parse puml into internal JSON representation
+CA -> DL: Send entities and relations to Dagre
+return layout result with positions and dimensions
+CA -> CA: Convert layout result to draw.io XML format
 CA -> USER: write result to output file
 @enduml
 
