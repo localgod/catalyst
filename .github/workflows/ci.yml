@@ -27,3 +27,31 @@ jobs:
         run: |
           npm run lint
           npm run mdlint
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          check-latest: true
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      - name: Install dependencies
+        run: |
+          ./setup.sh
+          npm ci
+      - name: Run tests with coverage
+        run: npm run test:coverage
+      - name: Report Coverage
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: always()
+        with:
+          name: 'Coverage Report'
+          json-summary-path: './coverage/coverage-summary.json'
+          json-final-path: './coverage/coverage-final.json'
+          vite-config-path: './vitest.config.ts'

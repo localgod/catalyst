@@ -1,12 +1,12 @@
 {
     "name": "catalyst",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "",
     "main": "index.js",
     "scripts": {
         "build": "tsc",
         "dev": "tsc --watch",
-        "exec": "node ./dist/catalyst.mjs -i diagram.puml -o output.drawio",
+        "exec": "node ./dist/src/catalyst.mjs -i diagram.puml -o output.drawio",
         "lint": "eslint ./src",
         "lintfix": "eslint --fix ./src",
         "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041",
@@ -25,11 +25,12 @@
     },
     "homepage": "https://catalyst.mindfield.dk",
     "dependencies": {
+        "@dagrejs/dagre": "^1.0.4",
         "cheerio": "^1.0.0-rc.12",
         "commander": "^14.0.0",
         "html-entities": "^2.6.0",
         "html-minifier-terser": "^7.2.0",
-        "plantuml-pipe": "^1.6.0",
+
         "unsplash-js": "^7.0.19",
         "xml2js": "^0.6.2"
     },

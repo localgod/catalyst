@@ -13,24 +13,6 @@ vi.mock('fs', () => ({
   }
 }));
 vi.mock('commander');
-vi.mock('plantuml-pipe', () => ({
-  PlantUmlPipe: vi.fn().mockImplementation(() => ({
-    out: {
-      on: vi.fn((event, callback) => {
-        if (event === 'data') {
-          callback('<svg>test</svg>');
-        }
-        if (event === 'end') {
-          setTimeout(callback, 0);
-        }
-      })
-    },
-    in: {
-      write: vi.fn(),
-      end: vi.fn()
-    }
-  }))
-}));
 
 vi.mock('../src/puml/EntityParser.mjs', () => ({
   EntityParser: vi.fn().mockImplementation(() => ({
@@ -48,18 +30,21 @@ vi.mock('../src/mx/Mx.mjs', () => ({
   MxGeometry: vi.fn()
 }));
 
-vi.mock('../src/svg/Svg.mjs', () => ({
-  Svg: vi.fn().mockImplementation(() => ({
-    load: vi.fn(),
-    getDocumentHeight: vi.fn().mockReturnValue(600),
-    getDocumentWidth: vi.fn().mockReturnValue(800),
-    getGroups: vi.fn().mockReturnValue([])
-  }))
-}));
-
 vi.mock('../src/puml/RelParser.mjs', () => ({
   RelParser: {
     getRelations: vi.fn().mockReturnValue([])
+  }
+}));
+
+vi.mock('../src/layout/LayoutEngine.mjs', () => ({
+  LayoutEngine: {
+    calculateLayout: vi.fn().mockResolvedValue({
+      nodes: [],
+      edges: [],
+      clusters: [],
+      width: 800,
+      height: 600
+    })
   }
 }));
 
@@ -75,6 +60,7 @@ describe('catalyst.mts', () => {
     mockCommandInstance = {
       description: vi.fn().mockReturnThis(),
       requiredOption: vi.fn().mockReturnThis(),
+      option: vi.fn().mockReturnThis(),
       action: vi.fn().mockReturnThis(),
       parse: vi.fn()
     };
@@ -87,9 +73,10 @@ describe('catalyst.mts', () => {
     await import('../src/catalyst.mjs');
     
     expect(mockCommand).toHaveBeenCalled();
-    expect(mockCommandInstance.description).toHaveBeenCalledWith('An application for converting plantuml diagrams to draw.io xml');
+    expect(mockCommandInstance.description).toHaveBeenCalledWith('An application for converting C4 diagrams to draw.io xml using Dagre layout engine');
     expect(mockCommandInstance.requiredOption).toHaveBeenCalledWith('-i, --input <path>', 'path to input file');
     expect(mockCommandInstance.requiredOption).toHaveBeenCalledWith('-o, --output <path>', 'path to output file');
+    expect(mockCommandInstance.option).toHaveBeenCalledWith('--layout-direction <direction>', 'layout direction (TB, BT, LR, RL)', 'TB');
   });
 
   it('should handle file system operations', () => {
