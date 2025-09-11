@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "moduleResolution": "Node",
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "typeRoots": [
       "./node_modules/@types",

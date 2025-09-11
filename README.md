@@ -22,13 +22,35 @@ The following dependencies needs to be available on the system:
 - Checkout this repo
 - Run `npm install` to install dependencies
 - Run `npm run dev` to start typescript compiler
-- Run `npm run exec` to test catalyst with the provided demo file `diagram.puml`
+- Run `npm run exec` to test catalyst with PlantUML layout (requires Java)
+- Or run `npm run exec:dagre` to test with Dagre layout (pure JavaScript, faster)
 
 The output is written to `output.drawio`.
 
-You may try to make changes to `diagram.puml` to see how catalyst behaves or you
-may call catalyst directly like this:
-`node ./dist/catalyst.mjs -i input.puml -o output.drawio`
+### Usage Options
+
+**PlantUML Layout (Original)**
+```bash
+npm run exec
+# Requires Java runtime
+```
+
+**Dagre Layout (Recommended)**
+```bash
+npm run exec:dagre
+# Pure JavaScript, 20x faster, no external dependencies
+```
+
+**Custom Usage**
+```bash
+# With custom files
+node ./dist/src/catalyst.mjs -i input.puml -o output.drawio
+
+# With Dagre and custom layout direction
+node ./dist/src/catalyst.mjs -i input.puml -o output.drawio --use-dagre --layout-direction LR
+```
+
+You may try to make changes to `diagram.puml` to see how catalyst behaves with either layout engine.
 
 ## Purpose
 

@@ -6,13 +6,15 @@
     "scripts": {
         "build": "tsc",
         "dev": "tsc --watch",
-        "exec": "node ./dist/catalyst.mjs -i diagram.puml -o output.drawio",
+        "exec": "node ./dist/src/catalyst.mjs -i diagram.puml -o output_p.drawio",
+        "exec:dagre": "node ./dist/src/catalyst.mjs -i diagram.puml -o output_d.drawio --use-dagre",
         "lint": "eslint ./src",
         "lintfix": "eslint --fix ./src",
         "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041",
         "test": "vitest",
         "test:run": "vitest run",
-        "test:coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "test:dagre": "vitest run tests/dagre-layout.test.mts"
     },
     "repository": {
         "type": "git",
@@ -25,6 +27,7 @@
     },
     "homepage": "https://catalyst.mindfield.dk",
     "dependencies": {
+        "@dagrejs/dagre": "^1.0.4",
         "cheerio": "^1.0.0-rc.12",
         "commander": "^14.0.0",
         "html-entities": "^2.6.0",

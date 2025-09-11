@@ -5,6 +5,7 @@ import { EntityParser, EntityDescriptor } from "./puml/EntityParser.mjs"
 import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { Svg } from './svg/Svg.mjs'
 import { RelParser } from './puml/RelParser.mjs'
+import { LayoutConverter } from './layout/LayoutConverter.mjs'
 
 async function svg2mx(svg: Svg, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string }[]): Promise<string> {
   const mx = new Mx(svg.getDocumentHeight(), svg.getDocumentWidth())
@@ -83,23 +84,44 @@ const program = new Command()
 program.description('An application for converting plantuml diagrams to draw.io xml')
 program.requiredOption('-i, --input <path>', 'path to input file')
 program.requiredOption('-o, --output <path>', 'path to output file')
+program.option('--use-dagre', 'use Dagre for layout calculation instead of PlantUML')
+program.option('--layout-direction <direction>', 'layout direction (TB, BT, LR, RL)', 'TB')
 program.action(async (options) => {
   if (fs.existsSync(options.input)) {
-    const svg = new Svg()
     const puml = await fs.promises.readFile(options.input, 'utf-8')
     const elements = new EntityParser().parse(puml)
     const relations = RelParser.getRelations(puml)
 
-    const svgData = await puml2Svg(options.input)
-    /* For debugging
-    try {
-      fs.writeFileSync('diagram.svg', svgData)
-    } catch (error) {
-      console.error('Error writing file:', error)
+    let layoutData
+    
+    if (options.useDagre) {
+      // Use Dagre for layout calculation
+      console.log('Using Dagre for layout calculation...')
+      layoutData = await LayoutConverter.calculateLayout(elements, relations, {
+        rankdir: options.layoutDirection as 'TB' | 'BT' | 'LR' | 'RL',
+        nodesep: 50,
+        edgesep: 10,
+        ranksep: 50,
+        marginx: 20,
+        marginy: 20
+      })
+    } else {
+      // Use PlantUML for layout calculation (existing behavior)
+      console.log('Using PlantUML for layout calculation...')
+      const svg = new Svg()
+      const svgData = await puml2Svg(options.input)
+      // For debugging - save SVG to examine structure
+      try {
+        fs.writeFileSync('diagram.svg', svgData)
+        console.log('SVG saved to diagram.svg for analysis')
+      } catch (error) {
+        console.error('Error writing SVG file:', error)
+      }
+      await svg.load(svgData)
+      layoutData = svg
     }
-    */
-    await svg.load(svgData)
-    const data = await svg2mx(svg, elements, relations)
+
+    const data = await svg2mx(layoutData as any, elements, relations)
 
     try {
       fs.writeFileSync(options.output, data)
