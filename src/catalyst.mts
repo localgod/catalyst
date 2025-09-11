@@ -1,5 +1,3 @@
-import fs from 'fs'
-import { Command } from 'commander'
 import { EntityParser, EntityDescriptor } from "./puml/EntityParser.mjs"
 import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { RelParser } from './puml/RelParser.mjs'
@@ -76,40 +74,54 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
 
 
 
-const program = new Command()
+export interface CatalystOptions {
+  layoutDirection?: 'TB' | 'BT' | 'LR' | 'RL'
+  nodesep?: number
+  edgesep?: number
+  ranksep?: number
+  marginx?: number
+  marginy?: number
+}
 
-program.description('An application for converting C4 diagrams to draw.io xml using Dagre layout engine')
-program.requiredOption('-i, --input <path>', 'path to input file')
-program.requiredOption('-o, --output <path>', 'path to output file')
-program.option('--layout-direction <direction>', 'layout direction (TB, BT, LR, RL)', 'TB')
-program.action(async (options) => {
-  if (fs.existsSync(options.input)) {
-    const puml = await fs.promises.readFile(options.input, 'utf-8')
-    const elements = new EntityParser().parse(puml)
-    const relations = RelParser.getRelations(puml)
+export class Catalyst {
+  /**
+   * Convert PlantUML C4 diagram to draw.io XML format
+   * @param pumlContent - The PlantUML content as string
+   * @param options - Layout options for the diagram
+   * @returns Promise<string> - The draw.io XML content
+   */
+  static async convert(pumlContent: string, options: CatalystOptions = {}): Promise<string> {
+    const elements = new EntityParser().parse(pumlContent)
+    const relations = RelParser.getRelations(pumlContent)
 
-    // Use Dagre for layout calculation
-    console.log('Using Dagre for layout calculation...')
-    const layoutData = await LayoutEngine.calculateLayout(elements, relations, {
-      rankdir: options.layoutDirection as 'TB' | 'BT' | 'LR' | 'RL',
-      nodesep: 50,
-      edgesep: 10,
-      ranksep: 50,
-      marginx: 20,
-      marginy: 20
-    })
-
-    const data = await layoutData2mx(layoutData, elements, relations)
-
-    try {
-      fs.writeFileSync(options.output, data)
-      console.log('File written successfully.')
-    } catch (error) {
-      console.error('Error writing file:', error)
+    const layoutOptions = {
+      rankdir: options.layoutDirection || 'TB',
+      nodesep: options.nodesep || 50,
+      edgesep: options.edgesep || 10,
+      ranksep: options.ranksep || 50,
+      marginx: options.marginx || 20,
+      marginy: options.marginy || 20
     }
-  } else {
-    throw new Error('Input file does not exist')
-  }
-})
 
-program.parse()
+    const layoutData = await LayoutEngine.calculateLayout(elements, relations, layoutOptions)
+    return await layoutData2mx(layoutData, elements, relations)
+  }
+
+  /**
+   * Parse PlantUML content and extract entities
+   * @param pumlContent - The PlantUML content as string
+   * @returns EntityDescriptor[] - Array of parsed entities
+   */
+  static parseEntities(pumlContent: string): EntityDescriptor[] {
+    return new EntityParser().parse(pumlContent)
+  }
+
+  /**
+   * Parse PlantUML content and extract relations
+   * @param pumlContent - The PlantUML content as string
+   * @returns Array of relations
+   */
+  static parseRelations(pumlContent: string): { source: string, target: string, label: string, description: string }[] {
+    return RelParser.getRelations(pumlContent)
+  }
+}

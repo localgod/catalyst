@@ -1,18 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import fs from 'fs';
-import { Command } from 'commander';
 
 // Mock dependencies
-vi.mock('fs', () => ({
-  default: {
-    existsSync: vi.fn(),
-    writeFileSync: vi.fn(),
-    promises: {
-      readFile: vi.fn()
-    }
-  }
-}));
-vi.mock('commander');
 
 vi.mock('../src/puml/EntityParser.mjs', () => ({
   EntityParser: vi.fn().mockImplementation(() => ({
@@ -48,47 +36,66 @@ vi.mock('../src/layout/LayoutEngine.mjs', () => ({
   }
 }));
 
-const mockFs = vi.mocked(fs);
-const mockCommand = vi.mocked(Command);
-
-describe('catalyst.mts', () => {
-  let mockCommandInstance: any;
-
+describe('Catalyst Library', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    mockCommandInstance = {
-      description: vi.fn().mockReturnThis(),
-      requiredOption: vi.fn().mockReturnThis(),
-      option: vi.fn().mockReturnThis(),
-      action: vi.fn().mockReturnThis(),
-      parse: vi.fn()
-    };
-    
-    mockCommand.mockReturnValue(mockCommandInstance);
   });
 
-  it('should create a Command instance', async () => {
-    // Import the module to trigger the command setup
-    await import('../src/catalyst.mjs');
+  it('should export Catalyst class', async () => {
+    const { Catalyst } = await import('../src/catalyst.mjs');
     
-    expect(mockCommand).toHaveBeenCalled();
-    expect(mockCommandInstance.description).toHaveBeenCalledWith('An application for converting C4 diagrams to draw.io xml using Dagre layout engine');
-    expect(mockCommandInstance.requiredOption).toHaveBeenCalledWith('-i, --input <path>', 'path to input file');
-    expect(mockCommandInstance.requiredOption).toHaveBeenCalledWith('-o, --output <path>', 'path to output file');
-    expect(mockCommandInstance.option).toHaveBeenCalledWith('--layout-direction <direction>', 'layout direction (TB, BT, LR, RL)', 'TB');
+    expect(Catalyst).toBeDefined();
+    expect(typeof Catalyst.convert).toBe('function');
+    expect(typeof Catalyst.parseEntities).toBe('function');
+    expect(typeof Catalyst.parseRelations).toBe('function');
   });
 
-  it('should handle file system operations', () => {
-    expect(mockFs.existsSync).toBeDefined();
-    expect(mockFs.writeFileSync).toBeDefined();
-    expect(mockFs.promises.readFile).toBeDefined();
+  it('should convert PlantUML content to draw.io XML', async () => {
+    const { Catalyst } = await import('../src/catalyst.mjs');
+    
+    const pumlContent = `
+      @startuml
+      !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+      System(sys1, "System 1", "Description")
+      @enduml
+    `;
+    
+    const result = await Catalyst.convert(pumlContent);
+    
+    expect(result).toBeDefined();
+    expect(typeof result).toBe('string');
+    expect(result).toContain('xml');
   });
 
-  it('should handle file write operations', () => {
-    const mockWriteFileSync = vi.fn();
-    mockFs.writeFileSync = mockWriteFileSync;
+  it('should parse entities from PlantUML content', async () => {
+    const { Catalyst } = await import('../src/catalyst.mjs');
     
-    expect(mockFs.writeFileSync).toBeDefined();
+    const pumlContent = `
+      @startuml
+      System(sys1, "System 1", "Description")
+      @enduml
+    `;
+    
+    const entities = Catalyst.parseEntities(pumlContent);
+    
+    expect(entities).toBeDefined();
+    expect(Array.isArray(entities)).toBe(true);
+  });
+
+  it('should parse relations from PlantUML content', async () => {
+    const { Catalyst } = await import('../src/catalyst.mjs');
+    
+    const pumlContent = `
+      @startuml
+      System(sys1, "System 1")
+      System(sys2, "System 2")
+      Rel(sys1, sys2, "uses")
+      @enduml
+    `;
+    
+    const relations = Catalyst.parseRelations(pumlContent);
+    
+    expect(relations).toBeDefined();
+    expect(Array.isArray(relations)).toBe(true);
   });
 });

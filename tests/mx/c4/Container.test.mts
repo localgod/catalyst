@@ -1,31 +1,24 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { Container } from '../../../src/mx/c4/Container.mjs';
-
-// Mock dependencies
-vi.mock('html-entities', () => ({
-  encode: vi.fn((str) => `encoded:${str}`)
-}));
-
-vi.mock('html-minifier-terser', () => ({
-  minify: vi.fn((html) => Promise.resolve(`minified:${html}`))
-}));
-
-vi.mock('cheerio', () => ({
-  load: vi.fn(() => {
-    const mockCheerio = vi.fn((selector: any) => ({
-      attr: vi.fn()
-    })) as any;
-    mockCheerio.html = vi.fn(() => '<div>test</div>');
-    return mockCheerio;
-  })
-}));
 
 describe('Container', () => {
   it('should generate label with proper HTML structure', async () => {
     const label = await Container.label();
     
-    expect(label).toContain('encoded:');
-    expect(label).toContain('minified:');
+    // Check that HTML is properly encoded
+    expect(label).toContain('&lt;div');
+    expect(label).toContain('&gt;');
+    expect(label).toContain('&quot;');
+    
+    // Check that placeholders are present
+    expect(label).toContain('%c4Name%');
+    expect(label).toContain('%c4Type%');
+    expect(label).toContain('%c4Technology%');
+    expect(label).toContain('%c4Description%');
+    
+    // Check that styles are applied
+    expect(label).toContain('font-size:16px;font-weight:bold;');
+    expect(label).toContain('font-size:11px;color:#cccccc;');
   });
 
   it('should generate style string with correct properties', () => {

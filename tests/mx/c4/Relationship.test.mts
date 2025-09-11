@@ -1,31 +1,23 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { Relastionship } from '../../../src/mx/c4/Relationship.mjs';
-
-// Mock dependencies
-vi.mock('html-entities', () => ({
-  encode: vi.fn((str) => `encoded:${str}`)
-}));
-
-vi.mock('html-minifier-terser', () => ({
-  minify: vi.fn((html) => Promise.resolve(`minified:${html}`))
-}));
-
-vi.mock('cheerio', () => ({
-  load: vi.fn(() => {
-    const mockCheerio = vi.fn((selector: any) => ({
-      attr: vi.fn()
-    })) as any;
-    mockCheerio.html = vi.fn(() => '<div>test</div>');
-    return mockCheerio;
-  })
-}));
 
 describe('Relastionship', () => {
   it('should generate label with proper HTML structure', async () => {
     const label = await Relastionship.label();
     
-    expect(label).toContain('encoded:');
-    expect(label).toContain('minified:');
+    // Check that HTML is properly encoded
+    expect(label).toContain('&lt;div');
+    expect(label).toContain('&gt;');
+    expect(label).toContain('&quot;');
+    
+    // Check that placeholders are present
+    expect(label).toContain('%c4Description%');
+    expect(label).toContain('%c4Technology%');
+    
+    // Check that styles are applied
+    expect(label).toContain('text-align: left;');
+    expect(label).toContain('text-align: center;font-weight:bold;');
+    expect(label).toContain('text-align: center');
   });
 
   it('should generate style string with correct properties', () => {

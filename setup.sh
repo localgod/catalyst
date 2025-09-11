@@ -1,6 +1,6 @@
  #!/usr/bin/env bash
 
-TAG=jetty-v1.2025.3
+TAG=jetty
 
 docker pull plantuml/plantuml-server:${TAG}
 sudo apt-get -q -y update

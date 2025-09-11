@@ -19,12 +19,21 @@
       "./types"
     ],
     "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "noImplicitAny": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "./**/*"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "sample",
+    "slides"
   ]
 }

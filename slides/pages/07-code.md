@@ -3,21 +3,23 @@
 
 # Code
 
-How do use...
+How to use the library...
 
-```bash {all|0|1|2-9|11}
-$ node ./dist/src/catalyst.mjs -h
-Usage: catalyst [options]
+```javascript {all|1|3-4|6-7|9-14}
+import { Catalyst } from 'catalyst'
 
-An application for converting C4 diagrams to draw.io xml using Dagre layout engine
+// Read PlantUML content
+const pumlContent = await fs.promises.readFile('diagram.puml', 'utf-8')
 
-Options:
-  -i, --input <path>                    path to input file
-  -o, --output <path>                   path to output file
-  --layout-direction <direction>        layout direction (TB, BT, LR, RL) (default: "TB")
-  -h, --help                           display help for command
+// Convert to draw.io XML
+const drawioXml = await Catalyst.convert(pumlContent)
 
-$ node ./dist/src/catalyst.mjs -i diagram.puml -o output.drawio
+// Advanced usage with options
+const drawioXml = await Catalyst.convert(pumlContent, {
+  layoutDirection: 'LR',  // 'TB', 'BT', 'LR', 'RL'
+  nodesep: 50,           // Node separation
+  ranksep: 50            // Rank separation
+})
 ```
 
 <style>

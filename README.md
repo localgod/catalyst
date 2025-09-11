@@ -1,23 +1,31 @@
 # Catalyst
 
-[![CI](https://github.com/localgod/catalyst/actions/workflows/ci.yml/badge.svg)](https://github.com/localgod/catalyst/actions/workflows/ci.yml)
+<div align="center">
+  <img src="logo.svg" width="100" height="100" alt="Catalyst Logo">
+</div>
 
-<img src="logo.svg" width="100" height="100" alt="Logo">
+[![CI](https://github.com/localgod/catalyst/actions/workflows/ci.yml/badge.svg)](https://github.com/localgod/catalyst/actions/workflows/ci.yml)
 
 ## Overview
 
-Catalyst is a software tool designed to facilitate the conversion of
+Catalyst is a JavaScript library designed to facilitate the conversion of
 C4 diagrams written in [PlantUML](https://plantuml.com/) format into [draw.io](https://draw.io)
 C4 diagrams. While PlantUML itself is not required as a runtime dependency,
-the tool parses diagrams written in PlantUML's C4 syntax (.puml files).
+the library parses diagrams written in PlantUML's C4 syntax (.puml files).
 This project uses the Dagre layout engine for fast, pure JavaScript
 layout calculation without external dependencies.
 
+## Installation
+
+Install Catalyst as a dependency in your project:
+
+```bash
+npm install catalyst
+```
+
 ## Requirements
 
-The following dependencies needs to be available on the system:
-
-- [NodeJS](https://nodejs.org)
+- [NodeJS](https://nodejs.org) (ES2024+ support)
 
 ## Input Format
 
@@ -42,34 +50,57 @@ Rel(systemA, containerA, "Uses")
 @enduml
 ```
 
+## Usage
+
+### Basic Usage
+
+```javascript
+import { Catalyst } from 'catalyst'
+import fs from 'fs'
+
+// Read PlantUML content
+const pumlContent = await fs.promises.readFile('diagram.puml', 'utf-8')
+
+// Convert to draw.io XML
+const drawioXml = await Catalyst.convert(pumlContent)
+
+// Save the result
+await fs.promises.writeFile('output.drawio', drawioXml)
+```
+
+### Advanced Usage with Options
+
+```javascript
+import { Catalyst } from 'catalyst'
+
+const drawioXml = await Catalyst.convert(pumlContent, {
+  layoutDirection: 'LR',  // 'TB', 'BT', 'LR', 'RL'
+  nodesep: 50,           // Node separation
+  edgesep: 10,           // Edge separation
+  ranksep: 50,           // Rank separation
+  marginx: 20,           // X margin
+  marginy: 20            // Y margin
+})
+```
+
+### Utility Methods
+
+```javascript
+// Parse entities only
+const entities = Catalyst.parseEntities(pumlContent)
+
+// Parse relations only
+const relations = Catalyst.parseRelations(pumlContent)
+```
+
 ## Try it out
 
 - Checkout this repo
 - Run `npm install` to install dependencies
-- Run `npm run dev` to start typescript compiler
-- Run `npm run exec` to test catalyst with Dagre layout engine
+- Run `npm run build` to compile the library
+- Run `npm run example` to test the sample usage
 
-The output is written to `output.drawio`.
-
-### Usage Options
-
-#### Basic Usage
-
-```bash
-npm run exec
-```
-
-#### Custom Usage
-
-```bash
-# With custom files
-node ./dist/src/catalyst.mjs -i input.puml -o output.drawio
-
-# With custom layout direction
-node ./dist/src/catalyst.mjs -i input.puml -o output.drawio --layout-direction LR
-```
-
-You may try to make changes to `diagram.puml` (PlantUML C4 format) to see how catalyst behaves with the Dagre layout engine.
+The sample output is written to `sample/output.drawio`.
 
 ## Purpose
 
@@ -87,12 +118,12 @@ The primary goal of this project is to support the [C4](https://c4model.com)
 modelling standard. C4 (Context, Containers, Components, and Code) is a popular
 architectural modeling approach for visualizing and documenting software
 architecture. By enabling the conversion of PlantUML C4 diagrams to draw.io,
-this tool facilitates the adoption of C4 modelling by providing a smooth
+this library facilitates the adoption of C4 modelling by providing a smooth
 transition from PlantUML's text-based format to draw.io's graphical capabilities.
 
 ## Key Features
 
-- **PlantUML C4 Format Support:** The converter parses and converts C4 diagrams
+- **PlantUML C4 Format Support:** The library parses and converts C4 diagrams
 written in PlantUML syntax (.puml files) without requiring PlantUML runtime.
 
 - **Fast Layout Engine:** Uses Dagre for pure JavaScript layout calculation,
@@ -104,8 +135,16 @@ refine their diagrams.
 
 ## Getting Started
 
-1. **Installation:** Clone the repository and follow the installation
-instructions in the README file.
+1. **Installation:** Install the library using npm:
+   ```bash
+   npm install catalyst
+   ```
+
+2. **Usage:** Import and use the library in your project:
+   ```javascript
+   import { Catalyst } from 'catalyst'
+   const drawioXml = await Catalyst.convert(pumlContent)
+   ```
 
 2. **Usage:** Refer to the documentation for detailed instructions on how to use
 the converter. Examples and usage scenarios are provided to assist you.

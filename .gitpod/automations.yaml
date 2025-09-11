@@ -1,0 +1,39 @@
+version: 1
+
+tasks:
+  - name: setup-environment
+    description: Setup development environment
+    init: |
+      bash ./setup.sh
+      source /home/gitpod/.bashrc
+      fnm install --latest
+
+  - name: install-dependencies
+    description: Install project dependencies
+    init: |
+      npm install
+      cd slides && npm install
+
+services:
+  - name: plantuml-server
+    description: PlantUML server for diagram rendering
+    command: docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1
+    ports:
+      - port: 8080
+        protocol: http
+
+  - name: slides-service
+    description: Slides development server
+    command: cd slides && npm run dev
+    ports:
+      - port: 3000
+        protocol: http
+
+  - name: typescript-service
+    description: Main TypeScript development server
+    command: npm run dev
+    env:
+      NODE_ENV: development
+    ports:
+      - port: 5173
+        protocol: http

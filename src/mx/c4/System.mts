@@ -1,15 +1,22 @@
-import { encode } from 'html-entities'
-import { minify } from 'html-minifier-terser'
-import * as cheerio from 'cheerio';
-
 class System {
     static async label() {
-        const template = `<div>%c4Name%</div><div>[%c4Type%:%c4Technology%]</div><div>%c4Description%</div>`;
-        const $ = cheerio.load(template, {});
-        $('div:eq(0)').attr('style', 'font-size:16px;font-weight:bold;')
-        $('div:eq(2)').attr('style', 'font-size:11px;color:#cccccc;')
-        const minifiedHtml = await minify($.html(), { collapseWhitespace: true });
-        return encode(minifiedHtml);
+        // Build HTML directly with inline styles
+        const html = `<div style="font-size:16px;font-weight:bold;">%c4Name%</div><div>[%c4Type%:%c4Technology%]</div><div style="font-size:11px;color:#cccccc;">%c4Description%</div>`;
+        
+        // Simple whitespace collapse
+        const minifiedHtml = html.replace(/>\s+</g, '><');
+        
+        // Simple HTML entity encoding
+        return this.encodeHtmlEntities(minifiedHtml);
+    }
+
+    private static encodeHtmlEntities(str: string): string {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
     static style() {
         const styles: Record<string, unknown> = {

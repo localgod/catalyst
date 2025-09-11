@@ -10,14 +10,14 @@ Catalyst processes C4 diagrams written in PlantUML syntax (.puml files). While t
 - `Rel()` relationship definitions  
 - Standard PlantUML C4 includes and formatting
 
-## Commandline
+## Library
 
-Catalyst is a commandline tool to support:
+Catalyst is a JavaScript library to support:
 
-- ***Efficiency***: Lightweight and task-focused, command line tools are efficient
-  for quick and repetitive tasks on resource-constrained systems.
+- ***Efficiency***: Lightweight and task-focused, the library is efficient
+  for quick and repetitive tasks in any JavaScript environment.
 - ***Scripting and Automation***: Easily integrated into scripts and automation
   workflows for efficient data processing.
-- ***Remote Access***: Command line tools are perfect for remote management and
-  headless machines.
+- ***Programmatic Access***: Perfect for integration into web applications,
+  Node.js services, and automated pipelines.
 - ***No External Dependencies***: Pure JavaScript implementation eliminates Java/Graphviz requirements.

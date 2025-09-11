@@ -6,4 +6,4 @@ PlantUML C4 format and draw.io are widely used diagramming approaches, each with
 
 ## Supporting C4 Modelling
 
-The primary goal of this project is to support the [C4](https://c4model.com) modelling standard. C4 (Context, Containers, Components, and Code) is a popular architectural modeling approach for visualizing and documenting software architecture. By enabling the conversion of PlantUML C4 diagrams to draw.io, this tool facilitates the adoption of C4 modelling by providing a smooth transition from PlantUML's text-based format to draw.io's graphical capabilities.
+The primary goal of this project is to support the [C4](https://c4model.com) modelling standard. C4 (Context, Containers, Components, and Code) is a popular architectural modeling approach for visualizing and documenting software architecture. By enabling the conversion of PlantUML C4 diagrams to draw.io, this library facilitates the adoption of C4 modelling by providing a smooth transition from PlantUML's text-based format to draw.io's graphical capabilities.
