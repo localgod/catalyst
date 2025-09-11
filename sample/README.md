@@ -11,12 +11,14 @@ This folder contains example scripts showing how to use Catalyst as a library.
 ## Usage
 
 1. First, build the library:
+
    ```bash
    cd ..
    npm run build
    ```
 
 2. Run the example:
+
    ```bash
    cd sample
    node example.mjs

@@ -136,20 +136,22 @@ refine their diagrams.
 ## Getting Started
 
 1. **Installation:** Install the library using npm:
+
    ```bash
    npm install catalyst
    ```
 
 2. **Usage:** Import and use the library in your project:
+
    ```javascript
    import { Catalyst } from 'catalyst'
    const drawioXml = await Catalyst.convert(pumlContent)
    ```
 
-2. **Usage:** Refer to the documentation for detailed instructions on how to use
+3. **Documentation:** Refer to the documentation for detailed instructions on how to use
 the converter. Examples and usage scenarios are provided to assist you.
 
-3. **Contribute:** We welcome contributions from the community. Feel free to
+4. **Contribute:** We welcome contributions from the community. Feel free to
 submit bug reports, feature requests, or pull requests on our GitHub repository.
 
 ## Testing and Coverage

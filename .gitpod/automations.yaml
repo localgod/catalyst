@@ -1,39 +1,61 @@
-version: 1
+services:
+  plantuml-server:
+    name: PlantUML Server
+    description: PlantUML server for diagram rendering
+    triggeredBy:
+      - postEnvironmentStart
+    commands:
+      start: docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1
+      ready: curl -f http://localhost:8080/plantuml/png/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000 -o /dev/null
+
+  slides-service:
+    name: Slides Development Server
+    description: Slides development server using Slidev
+    triggeredBy:
+      - manual
+    commands:
+      start: cd slides && npm run dev
+      ready: curl -f http://localhost:3030 -o /dev/null
+
+  typescript-service:
+    name: TypeScript Development Server
+    description: Main TypeScript development server
+    triggeredBy:
+      - manual
+    commands:
+      start: npm run dev
+      ready: curl -f http://localhost:5173 -o /dev/null
 
 tasks:
-  - name: setup-environment
+  setup-environment:
+    name: Setup Environment
     description: Setup development environment
-    init: |
+    triggeredBy:
+      - postEnvironmentStart
+    command: |
       bash ./setup.sh
       source /home/gitpod/.bashrc
       fnm install --latest
 
-  - name: install-dependencies
+  install-dependencies:
+    name: Install Dependencies
     description: Install project dependencies
-    init: |
+    dependsOn:
+      - setup-environment
+    command: |
       npm install
       cd slides && npm install
 
-services:
-  - name: plantuml-server
-    description: PlantUML server for diagram rendering
-    command: docker run -d -p 8080:8080 -e PLANTUML_LIMIT_SIZE=15000 plantuml/plantuml-server:jetty-v1.2023.1
-    ports:
-      - port: 8080
-        protocol: http
+  build-project:
+    name: Build Project
+    description: Build the TypeScript project
+    dependsOn:
+      - install-dependencies
+    command: npm run build
 
-  - name: slides-service
-    description: Slides development server
-    command: cd slides && npm run dev
-    ports:
-      - port: 3000
-        protocol: http
-
-  - name: typescript-service
-    description: Main TypeScript development server
-    command: npm run dev
-    env:
-      NODE_ENV: development
-    ports:
-      - port: 5173
-        protocol: http
+  run-tests:
+    name: Run Tests
+    description: Run the test suite
+    dependsOn:
+      - install-dependencies
+    command: npm run test:run

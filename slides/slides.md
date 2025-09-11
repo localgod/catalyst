@@ -74,6 +74,6 @@ src: ./pages/08-transformation.md
 
 ---
 layout: image-right
-image: https://images.unsplash.com/photo-1594482627762-6e876ce1ead4?&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MTcyMjF8MHwxfGFsbHx8fHx8fHx8fDE3MDQzNzc5MDZ8&ixlib=rb-4.0.3&q=80&w=1080t
+image: https://images.unsplash.com/photo-1594482627762-6e876ce1ead4?cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MTcyMjF8MHwxfGFsbHx8fHx8fHx8fDE3MDQzNzc5MDZ8&ixlib=rb-4.0.3&q=80&w=1080
 src: ./pages/09-thatsall.md
 ---
