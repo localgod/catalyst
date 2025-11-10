@@ -4,9 +4,10 @@ import { Mx, MxGeometry } from '../../src/mx/Mx.mjs';
 // Mock xml2js
 vi.mock('xml2js', () => ({
   default: {
-    Builder: vi.fn().mockImplementation(() => ({
-      buildObject: vi.fn().mockReturnValue('<xml>test</xml>')
-    }))
+    Builder: class {
+      constructor() {}
+      buildObject = vi.fn().mockReturnValue('<xml>test</xml>')
+    }
   }
 }));
 

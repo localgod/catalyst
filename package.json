@@ -58,6 +58,7 @@
         "@vitest/coverage-v8": "^4.0.8",
         "eslint": "^9.39.1",
         "globals": "^16.5.0",
+        "markdownlint-cli": "^0.43.0",
         "typescript-eslint": "^8.46.2",
         "vitest": "^4.0.8",
         "unsplash-js": "^7.0.20"
