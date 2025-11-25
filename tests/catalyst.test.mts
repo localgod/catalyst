@@ -3,19 +3,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock dependencies
 
 vi.mock('../src/puml/EntityParser.mjs', () => ({
-  EntityParser: vi.fn().mockImplementation(() => ({
-    parse: vi.fn().mockReturnValue([]),
-    getObjectWithPropertyAndValueInHierarchy: vi.fn().mockReturnValue(null)
-  }))
+  EntityParser: class MockEntityParser {
+    parse = vi.fn().mockReturnValue([])
+    getObjectWithPropertyAndValueInHierarchy = vi.fn().mockReturnValue(null)
+  }
 }));
 
 vi.mock('../src/mx/Mx.mjs', () => ({
-  Mx: vi.fn().mockImplementation(() => ({
-    addMxC4: vi.fn(),
-    addMxC4Relationship: vi.fn(),
-    generate: vi.fn().mockResolvedValue('<xml>test</xml>')
-  })),
-  MxGeometry: vi.fn()
+  Mx: class MockMx {
+    addMxC4 = vi.fn()
+    addMxC4Relationship = vi.fn()
+    generate = vi.fn().mockResolvedValue('<xml>test</xml>')
+  },
+  MxGeometry: class MockMxGeometry {
+    constructor(x: number, y: number, width: number, height: number) {}
+  }
 }));
 
 vi.mock('../src/puml/RelParser.mjs', () => ({
