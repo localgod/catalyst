@@ -10,8 +10,8 @@
         "dev": "tsc --watch",
         "prepublishOnly": "npm run build && npm run test:run",
         "example": "cd sample && node example.mjs",
-        "lint": "eslint ./src",
-        "lintfix": "eslint --fix ./src",
+        "lint": "oxlint ./src",
+        "lintfix": "oxlint --fix ./src",
         "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041",
         "test": "vitest",
         "test:run": "vitest run",
@@ -52,14 +52,11 @@
         "xml2js": "^0.6.2"
     },
     "devDependencies": {
-        "@eslint/js": "^9.0.0",
         "@types/node": "^25.3.0",
         "@types/xml2js": "^0.4.14",
         "@vitest/coverage-v8": "^4.0.18",
-        "eslint": "^9.0.0",
-        "globals": "^17.3.0",
-        "typescript-eslint": "^8.55.0",
-        "vitest": "^4.0.17",
-        "unsplash-js": "^7.0.20"
+        "oxlint": "^1.49.0",
+        "unsplash-js": "^7.0.20",
+        "vitest": "^4.0.17"
     }
 }
