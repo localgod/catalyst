@@ -54,7 +54,7 @@
     "devDependencies": {
         "@types/node": "^25.5.0",
         "@types/xml2js": "^0.4.14",
-        "@vitest/coverage-v8": "^4.0.18",
+        "@vitest/coverage-v8": "^4.1.0",
         "oxlint": "^1.55.0",
         "unsplash-js": "^7.0.20",
         "vitest": "^4.0.17"
