@@ -28,6 +28,12 @@ class Mx {
                     type: 'atlas'
                 },
                 diagram: {
+                    // Emit id + name so drawio-export / drawio-desktop headless
+                    // tools accept the XML (they reject bare <diagram>).
+                    $: {
+                        id: 'catalyst-diagram',
+                        name: 'Page-1'
+                    },
                     MxGraphModel: {
                         $: {
                             pageHeight: diagramHeight,
