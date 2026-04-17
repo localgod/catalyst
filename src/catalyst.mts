@@ -5,48 +5,42 @@ import { LayoutEngine, LayoutResult } from './layout/LayoutEngine.mjs'
 
 async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string }[]): Promise<string> {
   const mx = new Mx(layoutData.height || 600, layoutData.width || 800)
-  
-  // Handle nodes from layout data
+  const parser = new EntityParser()
+
+  // Build alias → parent-alias map by walking the entity hierarchy once.
+  // Used to preserve drawio containment (e.g. Container inside System_Boundary).
+  const parentOf = new Map<string, string>()
+  const walk = (entities: EntityDescriptor[], parent?: string) => {
+    for (const e of entities) {
+      if (parent) parentOf.set(e.alias, parent)
+      if (e.children) walk(e.children, e.alias)
+    }
+  }
+  walk(pumlElements)
+
+  // Handle nodes from layout data. Pass every valid C4 type through — Mx.addMxC4's
+  // switch decides the shape/style. `default: break` here would drop Persons,
+  // System_Ext, ContainerDb, etc.
   if (layoutData.nodes && Array.isArray(layoutData.nodes)) {
     for (const node of layoutData.nodes) {
       const g = new MxGeometry(node.height, node.width, node.x, node.y)
-      const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', node.id)
+      const info = parser.getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', node.id)
 
       if (info) {
-        switch (info.type) {
-          case 'System':
-            await mx.addMxC4(node.id, g, 'System', info.label, info.technology, info.description)
-            break
-          case 'Container':
-            await mx.addMxC4(node.id, g, 'Container', info.label, info.technology, info.description)
-            break
-          case 'Component':
-            await mx.addMxC4(node.id, g, 'Component', info.label, info.technology, info.description)
-            break
-          default:
-            break
-        }
+        await mx.addMxC4(node.id, g, info.type, info.label, info.technology, info.description, parentOf.get(node.id))
       }
     }
   }
 
-  // Handle clusters from layout data
+  // Handle clusters from layout data — same treatment. Boundaries land here
+  // (they're stack frames in the PUML and always have children).
   if (layoutData.clusters && Array.isArray(layoutData.clusters)) {
     for (const cluster of layoutData.clusters) {
       const g = new MxGeometry(cluster.height, cluster.width, cluster.x, cluster.y)
-      const info = new EntityParser().getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', cluster.id)
+      const info = parser.getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', cluster.id)
 
       if (info) {
-        switch (info.type) {
-          case 'System':
-            await mx.addMxC4(cluster.id, g, 'System', info.label, info.technology, info.description)
-            break
-          case 'Container':
-            await mx.addMxC4(cluster.id, g, 'Container', info.label, info.technology, info.description)
-            break
-          default:
-            break
-        }
+        await mx.addMxC4(cluster.id, g, info.type, info.label, info.technology, info.description, parentOf.get(cluster.id))
       }
     }
   }
