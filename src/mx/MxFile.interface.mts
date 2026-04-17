@@ -7,6 +7,10 @@ export interface MxFile {
             type: string;
         };
         diagram: {
+            $?: {
+                id?: string;
+                name?: string;
+            };
             MxGraphModel: MxGraphModel;
         };
     };
