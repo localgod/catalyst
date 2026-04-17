@@ -99,11 +99,15 @@ describe('EntityParser', () => {
       }
     `;
     const result = parser.parse(input);
-    
-    // The parser doesn't recognize System_Boundary as a valid type, so containers are parsed separately
-    expect(result).toHaveLength(2);
-    expect(result[0].alias).toBe('container1');
-    expect(result[1].alias).toBe('container2');
+
+    // System_Boundary is a valid entity type; it becomes the hierarchy parent
+    // and the two containers are its children.
+    expect(result).toHaveLength(1);
+    expect(result[0].alias).toBe('boundary1');
+    expect(result[0].type).toBe('System_Boundary');
+    expect(result[0].children).toHaveLength(2);
+    expect(result[0].children![0].alias).toBe('container1');
+    expect(result[0].children![1].alias).toBe('container2');
   });
 
   it('should find object with property and value in hierarchy', () => {
@@ -265,10 +269,13 @@ describe('EntityParser', () => {
       System(system2, "System 2")
     `;
     const result = parser.parse(input);
-    
-    // System_Boundary is not a valid entity type, so only the systems should be parsed
+
+    // System_Boundary encloses system1; system2 is a peer at the root.
     expect(result).toHaveLength(2);
-    expect(result[0].alias).toBe('system1');
+    expect(result[0].alias).toBe('boundary1');
+    expect(result[0].type).toBe('System_Boundary');
+    expect(result[0].children).toHaveLength(1);
+    expect(result[0].children![0].alias).toBe('system1');
     expect(result[1].alias).toBe('system2');
   });
 
