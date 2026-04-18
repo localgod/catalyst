@@ -66,9 +66,9 @@ describe('EntityParser', () => {
     const result = parser.parse(input);
     
     expect(result).toHaveLength(1);
-    expect(result[0].sprite).toBe('$sprite=server');
-    expect(result[0].tags).toBe('$tags=tag1');
-    expect(result[0].link).toBe('$link=http://example.com');
+    expect(result[0].sprite).toBe('server');
+    expect(result[0].tags).toBe('tag1');
+    expect(result[0].link).toBe('http://example.com');
   });
 
   it('should skip invalid entity types', () => {

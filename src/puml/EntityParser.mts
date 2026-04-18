@@ -2,6 +2,15 @@ import type { EntityDescriptor } from './EntityDescriptor.interface.mjs'
 
 class EntityParser {
 
+  /** Per-parse() quoted-string lookup table. Populated by parse(), consumed by parseBlock(). */
+  private quoted: string[] = [];
+
+  /** Restore `\u0001Q<n>\u0001` placeholders produced by parse() back to their original strings. */
+  private restoreQuoted(s: string | undefined): string | undefined {
+    if (s === undefined) return undefined;
+    return s.replace(/\u0001Q(\d+)\u0001/g, (_, n) => this.quoted[parseInt(n, 10)] ?? '');
+  }
+
   private isValidEntityType(type: string): boolean {
     return [
       'Person',
@@ -132,33 +141,57 @@ class EntityParser {
     const result: EntityDescriptor = {
       parent,
       type: typeName,
-      alias: props[0],
-      label: props[1],
+      alias: this.restoreQuoted(props[0])!,
+      label: this.restoreQuoted(props[1])!,
     };
 
-    const t = props.filter(prop => prop.match(/^(?!\$).*/));
-    switch (t.length) {
+    // Positional args are everything that doesn't start with `$` (named kwargs).
+    const positional = props.filter(prop => !prop.startsWith('$'));
+    switch (positional.length) {
       case 4:
-        result.technology = t[2];
-        result.description = t[3];
+        result.technology = this.restoreQuoted(positional[2]);
+        result.description = this.restoreQuoted(positional[3]);
         break;
       case 3:
-        result.technology = t[2];
+        result.technology = this.restoreQuoted(positional[2]);
         break;
       default:
         break;
     }
 
-    result.sprite = props.find(prop => prop.startsWith('$s'));
-    result.tags = props.find(prop => prop.startsWith('$t'));
-    result.link = props.find(prop => prop.startsWith('$l'));
+    // Named kwargs — match the exact C4-PlantUML names, not prefix-startsWith
+    // (which mis-triggers on $system, $target, $local, etc. downstream extensions).
+    const kwarg = (name: string) => {
+      const prefix = `$${name}=`;
+      const p = props.find(prop => prop.startsWith(prefix));
+      return p === undefined ? undefined : this.restoreQuoted(p.slice(prefix.length));
+    };
+    result.sprite = kwarg('sprite');
+    result.tags = kwarg('tags');
+    result.link = kwarg('link');
 
     return result;
   }
 
   parse(input: string): EntityDescriptor[] {
-    // Split input into individual lines, remove unnecessary characters
-    const systemBlocks = input.split('\n').map((block) => block.trim().replaceAll('"', ''));
+    // Fold `\`-continued lines into a single logical line before tokenising —
+    // PlantUML accepts backslash line-continuation inside procedure calls and
+    // real-world diagrams use it to wrap long Rel() / Container() calls.
+    const folded = input.replace(/\\\s*\n\s*/g, ' ');
+
+    // Replace every `"…"` string with a placeholder so that the quote-strip +
+    // comma-split below can't be confused by commas/parens inside descriptions
+    // (e.g. `"Stores logs, metrics, and events"`). Placeholders are restored
+    // before the result is returned from parseBlock.
+    const quoted: string[] = [];
+    const placeholderLines = folded.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (_, body) => {
+      quoted.push(body);
+      return `\u0001Q${quoted.length - 1}\u0001`;
+    });
+    this.quoted = quoted;
+
+    // Split input into individual lines, trim whitespace
+    const systemBlocks = placeholderLines.split('\n').map((block) => block.trim());
 
     // Initialize variables
     const result: EntityDescriptor[] = [];
