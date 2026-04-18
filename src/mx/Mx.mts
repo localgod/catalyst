@@ -3,13 +3,22 @@ import { MxGeometry } from './MxGeometry.mjs';
 import type { MxFile } from './MxFile.interface.mjs';
 import type { c4 } from './c4/c4.interface.mjs';
 import { System } from './c4/System.mjs';
+import { SystemExt } from './c4/SystemExt.mjs';
+import { SystemDb } from './c4/SystemDb.mjs';
+import { SystemQueue } from './c4/SystemQueue.mjs';
 import { Component } from './c4/Component.mjs';
+import { ComponentExt } from './c4/ComponentExt.mjs';
+import { ComponentDb } from './c4/ComponentDb.mjs';
+import { ComponentQueue } from './c4/ComponentQueue.mjs';
 import { Container } from './c4/Container.mjs';
+import { ContainerExt } from './c4/ContainerExt.mjs';
 import { ContainerDb } from './c4/ContainerDb.mjs';
+import { ContainerQueue } from './c4/ContainerQueue.mjs';
 import { Person } from './c4/Person.mjs';
 import { PersonExt } from './c4/PersonExt.mjs';
-import { SystemExt } from './c4/SystemExt.mjs';
 import { Boundary } from './c4/Boundary.mjs';
+import { EnterpriseBoundary } from './c4/EnterpriseBoundary.mjs';
+import { DeploymentNode } from './c4/DeploymentNode.mjs';
 import { Relastionship } from './c4/Relationship.mjs';
 
 class Mx {
@@ -60,86 +69,108 @@ class Mx {
 
     async addMxC4(alias: string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string, parent?: string): Promise<void> {
 
-        let c4Type = ''
+        let c4Type = type
         let label = ''
         let style = ''
         switch (type) {
+            // --- Persons ---
             case 'Person':
-                c4Type = 'Person'
                 label = await Person.label()
                 style = Person.style()
                 break;
             case 'Person_Ext':
-                c4Type = 'Person_Ext'
                 label = await PersonExt.label()
                 style = PersonExt.style()
                 break;
+
+            // --- Systems ---
             case 'System':
-                c4Type = 'System'
                 label = await System.label()
                 style = System.style()
                 break;
             case 'SystemDb':
+                label = await SystemDb.label()
+                style = SystemDb.style()
+                break;
             case 'SystemQueue':
-                // Reuse Container cylinder styling for DB/Queue variants until
-                // dedicated shape classes are added.
-                c4Type = type
-                label = await ContainerDb.label()
-                style = ContainerDb.style()
+                label = await SystemQueue.label()
+                style = SystemQueue.style()
                 break;
             case 'System_Ext':
             case 'SystemDb_Ext':
             case 'SystemQueue_Ext':
-                c4Type = type
+                // Grey external variants — could further diverge DB/Queue shapes
+                // but the spec's upstream skinparam-based styling collapses them
+                // into the same grey rectangle in most renderers.
                 label = await SystemExt.label()
                 style = SystemExt.style()
                 break;
+
+            // --- Containers ---
             case 'Container':
-                c4Type = 'Container'
                 label = await Container.label()
                 style = Container.style()
                 break;
             case 'ContainerDb':
-            case 'ContainerQueue':
-                c4Type = type
                 label = await ContainerDb.label()
                 style = ContainerDb.style()
+                break;
+            case 'ContainerQueue':
+                label = await ContainerQueue.label()
+                style = ContainerQueue.style()
                 break;
             case 'Container_Ext':
             case 'ContainerDb_Ext':
             case 'ContainerQueue_Ext':
-                c4Type = type
-                label = await SystemExt.label()
-                style = SystemExt.style()
+                label = await ContainerExt.label()
+                style = ContainerExt.style()
                 break;
+
+            // --- Components ---
             case 'Component':
-                c4Type = 'Component'
                 label = await Component.label()
                 style = Component.style()
                 break;
             case 'ComponentDb':
+                label = await ComponentDb.label()
+                style = ComponentDb.style()
+                break;
             case 'ComponentQueue':
-                c4Type = type
-                label = await ContainerDb.label()
-                style = ContainerDb.style()
+                label = await ComponentQueue.label()
+                style = ComponentQueue.style()
                 break;
             case 'Component_Ext':
             case 'ComponentDb_Ext':
             case 'ComponentQueue_Ext':
-                c4Type = type
-                label = await SystemExt.label()
-                style = SystemExt.style()
+                label = await ComponentExt.label()
+                style = ComponentExt.style()
+                break;
+
+            // --- Deployment level ---
+            case 'Node':
+            case 'Node_L':
+            case 'Node_R':
+            case 'Deployment_Node':
+            case 'Deployment_Node_L':
+            case 'Deployment_Node_R':
+                label = await DeploymentNode.label()
+                style = DeploymentNode.style()
+                break;
+
+            // --- Boundaries ---
+            case 'Enterprise_Boundary':
+                label = await EnterpriseBoundary.label()
+                style = EnterpriseBoundary.style()
                 break;
             case 'System_Boundary':
             case 'Container_Boundary':
-            case 'Enterprise_Boundary':
             case 'Boundary':
-                c4Type = type
                 label = await Boundary.label()
                 style = Boundary.style()
                 break;
 
             default:
+                c4Type = ''
                 break;
         }
 
@@ -167,7 +198,15 @@ class Mx {
         object.push(t);
     }
 
-    async addMxC4Relationship(geometry: MxGeometry, source: string, target: string, type: string, name: string, technology?: string, description?: string): Promise<void> {
+    async addMxC4Relationship(geometry: MxGeometry, source: string, target: string, type: string, name: string, technology?: string, description?: string, bidirectional: boolean = false): Promise<void> {
+
+        // Bidirectional rels get arrowheads on BOTH ends (startArrow+endArrow).
+        // The existing Relastionship.style() sets endArrow=blockThin; we override
+        // startArrow here so the base class stays focused on the common case.
+        let style = Relastionship.style()
+        if (bidirectional) {
+            style = style + ';startArrow=blockThin;startFill=1'
+        }
 
         const t: c4 = {
             $: {
@@ -180,7 +219,7 @@ class Mx {
             },
             MxCell: {
                 $: {
-                    style: Relastionship.style(),
+                    style,
                     parent: "1",
                     edge: 1,
                     source,
@@ -211,4 +250,14 @@ class Mx {
     }
 }
 
-export { Mx, MxGeometry, Relastionship, System, SystemExt, Component, Container, ContainerDb, Person, PersonExt, Boundary }
+export {
+    Mx,
+    MxGeometry,
+    Relastionship,
+    System, SystemExt, SystemDb, SystemQueue,
+    Component, ComponentExt, ComponentDb, ComponentQueue,
+    Container, ContainerExt, ContainerDb, ContainerQueue,
+    Person, PersonExt,
+    Boundary, EnterpriseBoundary,
+    DeploymentNode,
+}

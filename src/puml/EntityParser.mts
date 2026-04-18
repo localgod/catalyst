@@ -30,11 +30,53 @@ class EntityParser {
       'Container_Boundary',
       'Enterprise_Boundary',
       'Boundary',
+      // Deployment level (C4_Deployment.puml). Node and Deployment_Node are
+      // synonyms; the _L / _R suffixes are layout-direction hints handled by
+      // the spec itself, not distinct element types, but we accept them
+      // verbatim so the parser doesn't reject them.
+      'Node',
+      'Node_L',
+      'Node_R',
+      'Deployment_Node',
+      'Deployment_Node_L',
+      'Deployment_Node_R',
     ].indexOf(type) !== -1 ? true : false
   }
 
   private isComponent(str: string): boolean {
-    return str.match(/^(?!Rel\b|BiRel\b|UpdateElementStyle\b|UpdateSystemBoundaryStyle\b|AddRelTag\b|AddElementTag\b|Lay_[UDLR]\b|Lay_Distance\b|scale\b|title\b|LAYOUT_TOP_DOWN\b|LAYOUT_LEFT_RIGHT\b|LAYOUT_WITH_LEGEND\b|SHOW_LEGEND\b|SHOW_FLOATING_LEGEND\b|HIDE_STEREOTYPE\b|[@!]).*$/) === null;
+    // The regex is a negative lookahead: returns true (skip this line) when the
+    // line starts with one of these directives. Keep in sync with C4-PlantUML
+    // v2.10.0 procedure surface — anything not enumerated here is assumed to be
+    // an entity candidate.
+    const skipPrefixes = [
+      // Relationships — cover plain, _Back, _Neighbor, short + long directionals,
+      // BiRel variants, and RelIndex (dynamic) variants in one negative branch.
+      'Rel\\w*',          // Rel, Rel_Back, Rel_U, Rel_Up, Rel_Back_Neighbor, ...
+      'BiRel\\w*',
+      'RelIndex\\w*',
+      // Layout hints — produce no shape.
+      'Lay_[UDLR]\\b',
+      'Lay_(Up|Down|Left|Right|Distance)\\b',
+      'LAYOUT_\\w+',
+      // Styling / tags — TODO: honour these; for now skip.
+      'Update\\w+Style\\b',
+      'Add\\w+Tag\\b',
+      'UpdateSkinparamsAndLegendEntry\\b',
+      'SET_SKETCH_STYLE\\b',
+      // Legend / display.
+      'SHOW_LEGEND\\b', 'SHOW_FLOATING_LEGEND\\b', 'SHOW_DYNAMIC_LEGEND\\b',
+      'SHOW_PERSON_(OUTLINE|PORTRAIT|SPRITE)\\b',
+      'SHOW_FOOT_BOXES\\b', 'SHOW_INDEX\\b', 'SHOW_ELEMENT_DESCRIPTIONS\\b',
+      'HIDE_STEREOTYPE\\b',
+      // Properties / meta.
+      'AddProperty\\b', 'SetPropertyHeader\\b', 'WithoutPropertyHeader\\b',
+      'SetDefaultLegendEntries\\b',
+      // Misc PlantUML.
+      'scale\\b', 'title\\b', 'caption\\b', 'footer\\b', 'header\\b',
+      'skinparam\\b', 'legend\\b', 'endlegend\\b', 'note\\b', 'end note\\b',
+    ];
+    const pattern = new RegExp('^(?!(?:' + skipPrefixes.join('|') + ')|[@!]).*$');
+    return str.match(pattern) === null;
   }
 
   private parseBlock(parent: string, block: string): EntityDescriptor | null {
