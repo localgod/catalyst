@@ -1,0 +1,22 @@
+@startuml all-variants
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+
+title Exercise every entity variant catalyst claims to support
+
+Person(p, "Person")
+Person_Ext(pe, "Person_Ext")
+
+System(s, "System")
+SystemDb(sdb, "SystemDb", "DBMS")
+SystemQueue(sq, "SystemQueue", "Broker")
+System_Ext(se, "System_Ext")
+SystemDb_Ext(sdbe, "SystemDb_Ext", "DBMS")
+SystemQueue_Ext(sqe, "SystemQueue_Ext", "Broker")
+
+Container(c, "Container", "Tech")
+ContainerDb(cdb, "ContainerDb", "DBMS")
+ContainerQueue(cq, "ContainerQueue", "Broker")
+Container_Ext(ce, "Container_Ext", "Tech")
+ContainerDb_Ext(cdbe, "ContainerDb_Ext", "DBMS")
+ContainerQueue_Ext(cqe, "ContainerQueue_Ext", "Broker")
+@enduml
