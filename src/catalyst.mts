@@ -3,7 +3,7 @@ import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { RelParser } from './puml/RelParser.mjs'
 import { LayoutEngine, LayoutResult } from './layout/LayoutEngine.mjs'
 
-async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string }[]): Promise<string> {
+async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescriptor[], pumlRelations: { source: string, target: string, label: string, description: string, bidirectional?: boolean }[]): Promise<string> {
   const mx = new Mx(layoutData.height || 600, layoutData.width || 800)
   const parser = new EntityParser()
 
@@ -58,7 +58,7 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
         // Convert points array to MxGeometry format - for now use first point as geometry
         const firstPoint = points[0] || { x: 0, y: 0 }
         const g = new MxGeometry(20, 100, firstPoint.x, firstPoint.y) // Simple line geometry
-        await mx.addMxC4Relationship(g, edge.source, edge.target, 'Relationship', rel.label, rel.description)
+        await mx.addMxC4Relationship(g, edge.source, edge.target, 'Relationship', rel.label, undefined, rel.description, rel.bidirectional === true)
       }
     }
   }
@@ -115,7 +115,7 @@ export class Catalyst {
    * @param pumlContent - The PlantUML content as string
    * @returns Array of relations
    */
-  static parseRelations(pumlContent: string): { source: string, target: string, label: string, description: string }[] {
+  static parseRelations(pumlContent: string): { source: string, target: string, label: string, description: string, bidirectional: boolean }[] {
     return RelParser.getRelations(pumlContent)
   }
 }

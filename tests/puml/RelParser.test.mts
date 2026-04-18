@@ -24,13 +24,15 @@ describe('RelParser', () => {
       source: 'system1',
       target: 'system2',
       label: 'Uses',
-      description: 'HTTP API'
+      description: 'HTTP API',
+      bidirectional: false,
     });
     expect(relations[1]).toEqual({
       source: 'system2',
       target: 'system1',
       label: 'Responds',
-      description: 'JSON data'
+      description: 'JSON data',
+      bidirectional: false,
     });
   });
 
