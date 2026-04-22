@@ -5,6 +5,11 @@ import type { c4 } from './c4/c4.interface.mjs';
 import { System } from './c4/System.mjs';
 import { Component } from './c4/Component.mjs';
 import { Container } from './c4/Container.mjs';
+import { ContainerDb } from './c4/ContainerDb.mjs';
+import { Person } from './c4/Person.mjs';
+import { PersonExt } from './c4/PersonExt.mjs';
+import { SystemExt } from './c4/SystemExt.mjs';
+import { Boundary } from './c4/Boundary.mjs';
 import { Relastionship } from './c4/Relationship.mjs';
 
 class Mx {
@@ -47,26 +52,85 @@ class Mx {
         return this.doc.MxFile.diagram.MxGraphModel.root
     }
 
-    async addMxC4(alias: string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string): Promise<void> {
+    async addMxC4(alias: string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string, parent?: string): Promise<void> {
 
         let c4Type = ''
         let label = ''
         let style = ''
         switch (type) {
+            case 'Person':
+                c4Type = 'Person'
+                label = await Person.label()
+                style = Person.style()
+                break;
+            case 'Person_Ext':
+                c4Type = 'Person_Ext'
+                label = await PersonExt.label()
+                style = PersonExt.style()
+                break;
             case 'System':
                 c4Type = 'System'
                 label = await System.label()
                 style = System.style()
+                break;
+            case 'SystemDb':
+            case 'SystemQueue':
+                // Reuse Container cylinder styling for DB/Queue variants until
+                // dedicated shape classes are added.
+                c4Type = type
+                label = await ContainerDb.label()
+                style = ContainerDb.style()
+                break;
+            case 'System_Ext':
+            case 'SystemDb_Ext':
+            case 'SystemQueue_Ext':
+                c4Type = type
+                label = await SystemExt.label()
+                style = SystemExt.style()
                 break;
             case 'Container':
                 c4Type = 'Container'
                 label = await Container.label()
                 style = Container.style()
                 break;
+            case 'ContainerDb':
+            case 'ContainerQueue':
+                c4Type = type
+                label = await ContainerDb.label()
+                style = ContainerDb.style()
+                break;
+            case 'Container_Ext':
+            case 'ContainerDb_Ext':
+            case 'ContainerQueue_Ext':
+                c4Type = type
+                label = await SystemExt.label()
+                style = SystemExt.style()
+                break;
             case 'Component':
                 c4Type = 'Component'
                 label = await Component.label()
                 style = Component.style()
+                break;
+            case 'ComponentDb':
+            case 'ComponentQueue':
+                c4Type = type
+                label = await ContainerDb.label()
+                style = ContainerDb.style()
+                break;
+            case 'Component_Ext':
+            case 'ComponentDb_Ext':
+            case 'ComponentQueue_Ext':
+                c4Type = type
+                label = await SystemExt.label()
+                style = SystemExt.style()
+                break;
+            case 'System_Boundary':
+            case 'Container_Boundary':
+            case 'Enterprise_Boundary':
+            case 'Boundary':
+                c4Type = type
+                label = await Boundary.label()
+                style = Boundary.style()
                 break;
 
             default:
@@ -86,7 +150,7 @@ class Mx {
             MxCell: {
                 $: {
                     style,
-                    parent: "1",
+                    parent: parent || "1",
                     vertex: 1
                 },
                 MxGeometry: geometry
@@ -141,4 +205,4 @@ class Mx {
     }
 }
 
-export { Mx, MxGeometry, Relastionship, System, Component, Container }
+export { Mx, MxGeometry, Relastionship, System, SystemExt, Component, Container, ContainerDb, Person, PersonExt, Boundary }
