@@ -1,0 +1,122 @@
+@startuml c4-exhaustive
+' ---------------------------------------------------------------------------
+' All-encompassing C4-PlantUML fixture.
+'
+' Exercises every primitive tracked in docs/C4-COVERAGE.md so the structural
+' parity test (tests/parity.test.mts) can prove catalyst emits a drawio
+' vertex/cluster for every entity and a drawio edge for every relationship,
+' with all endpoints resolved. Also a valid C4-PlantUML document so the
+' PlantUML jar can render it for the side-by-side image proof.
+'
+' Keep this file in lockstep with docs/C4-COVERAGE.md.
+' ---------------------------------------------------------------------------
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Deployment.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Component.puml
+
+title C4-PlantUML exhaustive surface — every element, boundary, relationship and styling primitive
+
+LAYOUT_TOP_DOWN()
+
+' --- Styling directives (parsed; must not drop following elements) ---
+AddElementTag("critical", $bgColor="#aa0000", $fontColor="#ffffff", $borderColor="#660000")
+AddRelTag("async", $textColor="#0066cc", $lineColor="#0066cc", $lineStyle=DashedLine())
+AddBoundaryTag("zone", $bgColor="#eef7ee", $borderColor="#338833")
+UpdateElementStyle("external_system", $bgColor="#777777", $fontColor="#ffffff")
+UpdateRelStyle("default", $textColor="#404040", $lineColor="#828282")
+UpdateBoundaryStyle("default", $borderColor="#666666")
+
+' --- Properties (apply to the next element) ---
+SetPropertyHeader("Property", "Value")
+AddProperty("Region", "eu-west-1")
+
+' === People ===
+Person(dev, "Developer", "Builds services", $sprite="&cog", $link="https://example.com/dev")
+Person_Ext(extUser, "External User", "Third party", $tags="critical")
+
+' === Enterprise boundary wrapping the whole estate ===
+Enterprise_Boundary(ent, "Acme Corp") {
+
+  ' === System level (+ Db / Queue / _Ext variants) ===
+  System(sys, "Core System", "Primary platform")
+  SystemDb(sysDb, "System Database", "PostgreSQL")
+  SystemQueue(sysQ, "System Queue", "Kafka")
+  System_Ext(sysExt, "External System", "SaaS")
+  SystemDb_Ext(sysDbExt, "External DB", "Snowflake")
+  SystemQueue_Ext(sysQExt, "External Queue", "SQS")
+
+  ' === System boundary holding containers ===
+  System_Boundary(sb, "Core System Boundary") {
+
+    Container(api, "API", "Go", "REST surface")
+    ContainerDb(db, "DB", "PostgreSQL", "Primary store")
+    ContainerQueue(q, "Queue", "RabbitMQ", "Async work")
+    Container_Ext(apiExt, "Partner API", "REST")
+    ContainerDb_Ext(dbExt, "Partner DB", "Oracle")
+    ContainerQueue_Ext(qExt, "Partner Queue", "MQ")
+
+    ' === Container boundary holding components ===
+    Container_Boundary(cb, "API Container Boundary") {
+      Component(ctrl, "Controller", "Gin", "HTTP handlers")
+      ComponentDb(cache, "Cache", "Redis", "Hot data")
+      ComponentQueue(pub, "Publisher", "amqp", "Emits events")
+      Component_Ext(sdk, "Vendor SDK", "lib")
+      ComponentDb_Ext(cacheExt, "Vendor Cache", "memcached")
+      ComponentQueue_Ext(pubExt, "Vendor Bus", "nats")
+    }
+  }
+}
+
+' === Generic boundary ===
+Boundary(gb, "Generic Zone", "zone") {
+  System(zsys, "Zoned System", "In a generic boundary")
+}
+
+' === Deployment level (Node / Deployment_Node + _L / _R) ===
+Deployment_Node(dn, "Region", "AWS eu-west-1") {
+  Deployment_Node_L(dnL, "AZ-a", "Availability Zone") {
+    Node(n1, "Host 1", "EC2")
+  }
+  Deployment_Node_R(dnR, "AZ-b", "Availability Zone") {
+    Node_L(n2, "Host 2", "EC2")
+    Node_R(n3, "Host 3", "EC2")
+  }
+}
+
+' === Relationships — full surface ===
+Rel(dev, api, "Codes against")
+Rel(dev, api, "Deploys", "kubectl")
+Rel(api, db, "Reads / writes", "SQL")
+Rel(api, db, "Migrates", "Flyway")
+Rel(api, api, "Self heal", "internal")
+Rel_Back(db, api, "ack")
+Rel_Neighbor(api, q, "enqueues")
+Rel_Back_Neighbor(q, api, "drains")
+Rel_U(ctrl, cache, "reads")
+Rel_D(ctrl, pub, "publishes")
+Rel_L(api, apiExt, "calls")
+Rel_R(api, sysExt, "integrates")
+Rel_Up(extUser, api, "uses")
+Rel_Down(api, dbExt, "syncs")
+Rel_Left(api, qExt, "bridges")
+Rel_Right(sys, sysDb, "persists")
+BiRel(sys, sysQ, "exchanges")
+BiRel_Neighbor(sysQ, sysQExt, "federates")
+BiRel_U(sys, sysDbExt, "replicates")
+BiRel_D(api, n1, "deployed on")
+BiRel_L(zsys, sys, "links")
+BiRel_R(sdk, ctrl, "embedded in")
+BiRel_Up(pub, q, "feeds")
+BiRel_Down(cache, db, "warms from")
+BiRel_Left(pubExt, pub, "vendors")
+BiRel_Right(cacheExt, cache, "vendors")
+Rel(ctrl, cache, "async refresh", "amqp", $tags="async")
+
+' === Layout hints (no shapes; must not break parsing) ===
+Lay_U(dev, extUser)
+Lay_D(api, db)
+Lay_L(sys, sysExt)
+Lay_R(sysDb, sysQ)
+Lay_Distance(dev, api, 2)
+
+SHOW_LEGEND()
+@enduml

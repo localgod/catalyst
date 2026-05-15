@@ -1,0 +1,20 @@
+{
+  "nodes": [
+    "charts:System_Ext",
+    "dev:Person",
+    "docker:System_Ext",
+    "host:System_Boundary",
+    "kind:System",
+    "registries:System_Ext"
+  ],
+  "edges": [
+    "dev->kind",
+    "kind->charts",
+    "kind->docker",
+    "kind->registries"
+  ],
+  "nodeCount": 6,
+  "edgeCount": 4,
+  "links": 0,
+  "hasDiagramId": true
+}

@@ -1,4 +1,5 @@
 import dagre from '@dagrejs/dagre'
+import type { Graph, Edge } from '@dagrejs/dagre'
 import { EntityDescriptor } from '../puml/EntityDescriptor.interface.mjs'
 
 interface DagreNode {
@@ -27,6 +28,7 @@ interface LayoutNode {
 interface LayoutEdge {
   source: string
   target: string
+  name?: string
   points?: { x: number; y: number }[]
 }
 
@@ -39,13 +41,16 @@ interface LayoutResult {
 }
 
 class LayoutEngine {
-  private graph: dagre.graphlib.Graph
+  private graph: Graph
   private clusters: Map<string, LayoutNode> = new Map()
   private nodeHierarchy: Map<string, string[]> = new Map()
 
   constructor() {
-    // Start with simple graph, we'll handle hierarchy manually
-    this.graph = new dagre.graphlib.Graph()
+    // multigraph: keep parallel relationships (multiple Rel/BiRel between the
+    // same source/target, and self-loops) as distinct edges. A plain graph
+    // collapses setEdge(v,w) calls, silently dropping every relation after the
+    // first between a given pair — see RelParser / parity test.
+    this.graph = new dagre.graphlib.Graph({ multigraph: true })
     this.graph.setGraph({
       rankdir: 'TB',
       align: 'UL',
@@ -139,11 +144,14 @@ class LayoutEngine {
    * Add edges from parsed C4 relations
    */
   addEdges(relations: { source: string; target: string; label: string; description: string }[]): void {
-    relations.forEach(relation => {
+    // Unique per-relation name (4th setEdge arg) so the multigraph keeps every
+    // parallel edge instead of overwriting on (v,w). Index keeps it stable and
+    // lets layoutData2mx correlate a layout edge back to its source relation.
+    relations.forEach((relation, i) => {
       this.graph.setEdge(relation.source, relation.target, {
         label: relation.label,
         description: relation.description
-      })
+      }, `rel${i}`)
     })
   }
 
@@ -225,7 +233,7 @@ class LayoutEngine {
     const allNodes: LayoutNode[] = []
 
     // Collect positioned leaf nodes
-    this.graph.nodes().forEach(nodeId => {
+    this.graph.nodes().forEach((nodeId: string) => {
       const node = this.graph.node(nodeId) as DagreNode
       
       if (node && node.x !== undefined && node.y !== undefined) {
@@ -283,11 +291,58 @@ class LayoutEngine {
       maxRowHeight = Math.max(maxRowHeight, systemBounds.height)
     })
 
-    const edges: LayoutEdge[] = this.graph.edges().map(edgeObj => {
+    // Guaranteed-emission post-pass. The recursive positioning above only
+    // descends one cluster level below each root (positionComponentsInContainer
+    // handles leaf nodes, not nested clusters), so a boundary nested ≥2 deep
+    // (e.g. Container_Boundary inside System_Boundary inside Enterprise_Boundary)
+    // would never be added to clustersArray and would silently vanish from the
+    // drawio output. Parity requires EVERY cluster to be emitted: derive a box
+    // from any already-positioned descendants, else fall back to default dims.
+    const deriveClusterGeom = (clusterId: string): { x: number; y: number; width: number; height: number } => {
+      const childIds = this.nodeHierarchy.get(clusterId) || []
+      let minX = Infinity, minY = Infinity, maxX2 = -Infinity, maxY2 = -Infinity, found = false
+      for (const cid of childIds) {
+        const child = allNodesMap.get(cid) || allClustersMap.get(cid)
+        if (child && child.x !== undefined && child.y !== undefined && isFinite(child.x) && isFinite(child.y)) {
+          minX = Math.min(minX, child.x - child.width / 2)
+          minY = Math.min(minY, child.y - child.height / 2)
+          maxX2 = Math.max(maxX2, child.x + child.width / 2)
+          maxY2 = Math.max(maxY2, child.y + child.height / 2)
+          found = true
+        }
+      }
+      if (!found) {
+        const d = this.getDefaultDimensions(this.clusters.get(clusterId)?.type || 'System')
+        return { x: 0, y: 0, width: d.width, height: d.height }
+      }
+      const pad = this.getContainerTextPadding(this.clusters.get(clusterId)?.type || 'System')
+      return {
+        x: (minX + maxX2) / 2,
+        y: (minY + maxY2) / 2,
+        width: (maxX2 - minX) + pad.left + pad.right,
+        height: (maxY2 - minY) + pad.top + pad.bottom
+      }
+    }
+    // Deepest-first so a parent's box encloses already-emitted child boxes.
+    const missingClusters = Array.from(this.clusters.values())
+      .filter(c => !allClustersMap.has(c.id))
+      .sort((a, b) => (this.nodeHierarchy.get(b.id)?.length || 0) - (this.nodeHierarchy.get(a.id)?.length || 0))
+    for (const c of missingClusters) {
+      const geom = deriveClusterGeom(c.id)
+      const node: LayoutNode = { ...c, x: geom.x, y: geom.y, width: geom.width, height: geom.height }
+      allClustersMap.set(c.id, node)
+      clustersArray.push(node)
+    }
+
+    const edges: LayoutEdge[] = this.graph.edges().map((edgeObj: Edge) => {
       const edge = this.graph.edge(edgeObj)
       return {
         source: edgeObj.v,
         target: edgeObj.w,
+        // edgeObj.name is `rel<index>` set in addEdges — carries the source
+        // relation's position so layoutData2mx emits one drawio edge per
+        // parsed relation (parallel edges + self-loops included).
+        name: edgeObj.name,
         ...edge,
         points: edge.points || []
       }

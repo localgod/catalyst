@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    "apps:Container",
+    "cp:Container",
+    "dash:Container",
+    "dev:Person",
+    "docker:Container",
+    "host:System_Boundary",
+    "ingress:Container",
+    "kind:System_Boundary",
+    "lb:Container",
+    "metrics:Container",
+    "nfs:ContainerDb",
+    "prom:Container",
+    "worker:Container"
+  ],
+  "edges": [
+    "apps->nfs",
+    "dev->docker",
+    "dev->ingress",
+    "dev->lb",
+    "ingress->apps",
+    "lb->apps"
+  ],
+  "nodeCount": 13,
+  "edgeCount": 6,
+  "links": 0,
+  "hasDiagramId": true
+}

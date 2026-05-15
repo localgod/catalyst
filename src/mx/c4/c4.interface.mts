@@ -12,6 +12,8 @@ export interface c4 {
         factSheetType?: string;
         factSheetId?: string;
         id?: string;
+        /** $link= on a C4 element → clickable drawio link on the object. */
+        link?: string;
     };
     MxCell: MxCell;
 }
