@@ -131,12 +131,12 @@ The parity test asserts: every entity → a shape with matching `c4Type`; every 
 
 ### Tier 2 — remaining visual fidelity
 
-6. Dedicated shape classes for `SystemDb`, `SystemQueue`, `ContainerQueue`, `Component*` variants, `Container_Ext`/`Component_Ext`/`SystemDb_Ext` (proper colour distinction — currently `~`, see tables above).
-7. Boundary type distinction: `Container_Boundary` rendered as generic `Boundary` (`~`); `Enterprise_Boundary` already distinct.
-8. `$sprite` → drawio shape decorator (no drawio sprite registry; parsing never breaks).
+1. Dedicated shape classes for `SystemDb`, `SystemQueue`, `ContainerQueue`, `Component*` variants, `Container_Ext`/`Component_Ext`/`SystemDb_Ext` (proper colour distinction — currently `~`, see tables above).
+2. Boundary type distinction: `Container_Boundary` rendered as generic `Boundary` (`~`); `Enterprise_Boundary` already distinct.
+3. `$sprite` → drawio shape decorator (no drawio sprite registry; parsing never breaks).
 
 ### Tier 3 — nice-to-have
 
-9. `SHOW_LEGEND` → drawio legend box (currently skipped; structural parity unaffected).
-10. `Lay_*` hints fed to dagre as directional edge weights / layout constraints.
-11. `AddProperty` / property tables rendered below element.
+1. `SHOW_LEGEND` → drawio legend box (currently skipped; structural parity unaffected).
+2. `Lay_*` hints fed to dagre as directional edge weights / layout constraints.
+3. `AddProperty` / property tables rendered below element.
