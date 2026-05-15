@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    "c:Container",
+    "cdb:ContainerDb",
+    "cdbe:ContainerDb_Ext",
+    "ce:Container_Ext",
+    "cq:ContainerQueue",
+    "cqe:ContainerQueue_Ext",
+    "p:Person",
+    "pe:Person_Ext",
+    "s:System",
+    "sdb:SystemDb",
+    "sdbe:SystemDb_Ext",
+    "se:System_Ext",
+    "sq:SystemQueue",
+    "sqe:SystemQueue_Ext"
+  ],
+  "edges": [],
+  "nodeCount": 14,
+  "edgeCount": 0,
+  "links": 0,
+  "hasDiagramId": true
+}

@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    "a:System",
+    "b:System",
+    "c:System",
+    "d:System"
+  ],
+  "edges": [
+    "a->b",
+    "a->b",
+    "a->b",
+    "a->b",
+    "a->b",
+    "a->c",
+    "a->c",
+    "a->c",
+    "a->c",
+    "a->d",
+    "a->d",
+    "a->d",
+    "a->d",
+    "b->c",
+    "b->c",
+    "b->d",
+    "c->d"
+  ],
+  "nodeCount": 4,
+  "edgeCount": 17,
+  "links": 0,
+  "hasDiagramId": true
+}

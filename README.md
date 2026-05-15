@@ -163,7 +163,28 @@ The project includes comprehensive test coverage with automated reporting:
 - **Coverage thresholds:** 85% for branches, functions, lines, and statements
 - **Automated coverage reports** are generated on every PR via GitHub Actions
 
-Current coverage: **89.35%** overall with 106 passing tests.
+### Verifying conversions (parity, snapshots, visual proof)
+
+PlantUML and draw.io use different layout engines, so a rendered `.puml` and
+the converted `.drawio` are **never pixel-identical** even for a perfect
+conversion. Correctness is therefore guaranteed structurally, not visually:
+
+- **Structural parity** (`tests/parity.test.mjs`) — for every fixture
+  (including `tests/fixtures/c4-exhaustive.puml`, which exercises every
+  C4-PlantUML primitive in [`docs/C4-COVERAGE.md`](docs/C4-COVERAGE.md)):
+  every parsed entity emits a draw.io shape with a matching `c4Type`, every
+  relation emits one connector (parallel relations and self-loops included),
+  every connector endpoint resolves to an emitted shape, and a
+  `<diagram id+name>` is present. Loss fails the build.
+- **Drawio structural snapshot** (`tests/golden.test.mjs`) — a deterministic,
+  same-engine regression gate (committed fingerprints under `tests/golden/`).
+  Regenerate intentional changes with `npm run golden:update`.
+- **Visual proof** (`npm run render-compare` / `make render-compare`) — renders
+  the source `.puml` (PlantUML) and the catalyst `.drawio` (drawio-export)
+  side by side for human review. Requires `java` + `docker`; **not** a CI gate.
+
+Current coverage: see the CI coverage report (170+ tests across unit, parity
+and snapshot suites).
 
 ## Why Convert?
 

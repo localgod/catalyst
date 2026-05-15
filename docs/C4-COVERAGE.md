@@ -87,15 +87,19 @@ Legend: `✓` full, `~` partial (rendered but not with dedicated styling), `✗`
 
 ## Styling
 
+Handled by `src/puml/StyleParser.mts` (colour kwargs `$bgColor`/`$fontColor`/`$borderColor`/`$lineColor`/`$textColor`/`$lineStyle` → drawio `fillColor`/`fontColor`/`strokeColor`/`dashed`).
+
 | Primitive | State |
 |---|---|
-| `AddElementTag($tagStereo, $bgColor, ...)` | ✗ (silently skipped) |
-| `AddRelTag` / `AddBoundaryTag` | ✗ |
-| `UpdateElementStyle` / `UpdateRelStyle` / `UpdateBoundaryStyle` | ✗ |
-| `$tags="critical"` inline on shape/rel | ✗ (parsed as `tags` field on EntityDescriptor but not applied) |
-| `$sprite=img:foo` | ✗ (parsed as `sprite` but not rendered) |
-| `$link=https://...` | ✗ (parsed as `link` but not rendered) |
-| `SET_SKETCH_STYLE` | ✗ |
+| `AddElementTag($tagStereo, $bgColor, $fontColor, $borderColor)` | ✓ (applied to elements whose `$tags` matches) |
+| `AddRelTag($tag, $textColor, $lineColor, $lineStyle)` | ✓ (applied to rels whose `$tags` matches; `DashedLine()` → `dashed=1`) |
+| `AddBoundaryTag($tag, $bgColor, $borderColor, $fontColor)` | ✓ (applied to boundaries whose `$tags` matches) |
+| `UpdateElementStyle($elementName, ...)` | ✓ for mapped kinds (person/system/container/component + `_ext`/`_db`/`_queue`); unmapped kinds ignored |
+| `UpdateRelStyle` / `UpdateBoundaryStyle` | ✓ (global default override) |
+| `$tags="critical"` inline on shape / rel / boundary | ✓ (`+`-separated multi-tag supported; last tag wins on conflict) |
+| `$link=https://...` | ✓ (emitted as clickable `link=` attribute on the drawio object) |
+| `$sprite=img:foo` / `$sprite=&icon` | ✗ (parsed as `sprite`; not rendered — drawio has no PlantUML sprite registry. Parsing never breaks) |
+| `$shadowing`, custom `$lineStyle` (Bold/Dotted), `SET_SKETCH_STYLE` | ✗ (parsed/skipped; not mapped to drawio equivalents) |
 
 ## Legend / display
 
@@ -115,23 +119,24 @@ Legend: `✓` full, `~` partial (rendered but not with dedicated styling), `✗`
 
 Ordered by value × tractability.
 
-### Tier 1 — structural correctness
+### Done (structural correctness — parity-gated by `tests/parity.test.mts`)
 
-1. **Deployment nodes** (`Deployment_Node`, `Node`) — whole C4 level missing.
-2. **BiRel bidirectional** — currently shown as unidirectional; visually misleading.
-3. **Long-form Rel names** (`Rel_Up`/`Rel_Down`/etc.) + `BiRel_*` variants + `Rel_Back_Neighbor` in regex.
-4. **`$tags` / `$sprite` / `$link` in shapes** — at minimum, don't break parsing when present.
+1. ✅ **Deployment nodes** (`Deployment_Node`/`Node` + `_L`/`_R`), including deep nesting (guaranteed-emission post-pass in `LayoutEngine`).
+2. ✅ **BiRel bidirectional** — `startArrow` emitted.
+3. ✅ **Long-form Rel names** + `BiRel_*` + `Rel_Back_Neighbor`.
+4. ✅ **Parallel relations + self-loops** — one drawio edge per parsed relation (multigraph; was collapsing 17→6).
+5. ✅ **`$tags` / `$link` applied; `AddElementTag`/`AddRelTag`/`AddBoundaryTag`/`UpdateElementStyle`/`UpdateRelStyle`/`UpdateBoundaryStyle`** → colour/dashed overrides.
 
-### Tier 2 — visual fidelity
+The parity test asserts: every entity → a shape with matching `c4Type`; every relation → an edge; every endpoint resolves; `<diagram id+name>` present. Run against `c4-exhaustive.puml` (the all-encompassing fixture) + 5 real fixtures.
 
-5. Dedicated shape classes for `SystemDb`, `SystemQueue`, `ContainerQueue`, `Component*` variants, `Container_Ext`/`Component_Ext`/`SystemDb_Ext` (proper colour distinction).
-6. Boundary type distinction: `Enterprise_Boundary` styled bolder; `Container_Boundary` darker.
-7. `$sprite` → drawio shape decorator.
+### Tier 2 — remaining visual fidelity
+
+6. Dedicated shape classes for `SystemDb`, `SystemQueue`, `ContainerQueue`, `Component*` variants, `Container_Ext`/`Component_Ext`/`SystemDb_Ext` (proper colour distinction — currently `~`, see tables above).
+7. Boundary type distinction: `Container_Boundary` rendered as generic `Boundary` (`~`); `Enterprise_Boundary` already distinct.
+8. `$sprite` → drawio shape decorator (no drawio sprite registry; parsing never breaks).
 
 ### Tier 3 — nice-to-have
 
-8. `AddElementTag` / `UpdateElementStyle` → per-tag style overrides.
-9. `SHOW_LEGEND` → drawio legend box.
+9. `SHOW_LEGEND` → drawio legend box (currently skipped; structural parity unaffected).
 10. `Lay_*` hints fed to dagre as directional edge weights / layout constraints.
-11. `$link` → drawio `UserObject` link.
-12. `AddProperty` / property tables rendered below element.
+11. `AddProperty` / property tables rendered below element.

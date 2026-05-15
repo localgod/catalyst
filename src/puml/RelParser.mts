@@ -19,8 +19,8 @@ class RelParser {
         this.points = []
     }
 
-    static getRelations(pumlString: string): Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean }> {
-        const relations: Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean }> = [];
+    static getRelations(pumlString: string): Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean, tags?: string }> {
+        const relations: Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean, tags?: string }> = [];
 
         // Cover the full C4-PlantUML relationship surface. The leading
         // (?<primitive>...) capture lets us tell BiRel apart so the renderer
@@ -50,6 +50,9 @@ class RelParser {
             const label = match[5].trim();
             const description = (match[6] ?? '').trim();
             const bidirectional = primitive.startsWith('BiRel');
+            // $tags="x" may appear in the trailing args swallowed by `[^)]*`.
+            const tagMatch = /\$tags\s*=\s*"([^"]*)"/.exec(match[0]);
+            const tags = tagMatch ? tagMatch[1] : undefined;
 
             relations.push({
                 source,
@@ -57,6 +60,7 @@ class RelParser {
                 label,
                 description,
                 bidirectional,
+                tags,
             });
         }
 

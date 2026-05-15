@@ -15,7 +15,9 @@
         "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041",
         "test": "vitest",
         "test:run": "vitest run",
-        "test:coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "golden:update": "UPDATE_GOLDEN=1 vitest run tests/golden.test.mjs",
+        "render-compare": "npm run build && node scripts/render-compare.mjs"
     },
     "repository": {
         "type": "git",

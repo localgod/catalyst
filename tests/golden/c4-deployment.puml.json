@@ -1,0 +1,20 @@
+{
+  "nodes": [
+    "api:Container",
+    "aws:Deployment_Node",
+    "cache:ContainerDb",
+    "cdn:Deployment_Node",
+    "cluster:Deployment_Node",
+    "db:ContainerDb",
+    "rds:Deployment_Node"
+  ],
+  "edges": [
+    "api->cache",
+    "api->db",
+    "cdn->api"
+  ],
+  "nodeCount": 7,
+  "edgeCount": 3,
+  "links": 0,
+  "hasDiagramId": true
+}

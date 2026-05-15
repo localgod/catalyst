@@ -20,6 +20,8 @@ import { Boundary } from './c4/Boundary.mjs';
 import { EnterpriseBoundary } from './c4/EnterpriseBoundary.mjs';
 import { DeploymentNode } from './c4/DeploymentNode.mjs';
 import { Relastionship } from './c4/Relationship.mjs';
+import { StyleParser } from '../puml/StyleParser.mjs';
+import type { StyleOverride } from '../puml/StyleParser.mjs';
 
 class Mx {
     doc: MxFile
@@ -67,7 +69,7 @@ class Mx {
         return this.doc.MxFile.diagram.MxGraphModel.root
     }
 
-    async addMxC4(alias: string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string, parent?: string): Promise<void> {
+    async addMxC4(alias: string, geometry: MxGeometry, type: string, name: string, technology?: string, description?: string, parent?: string, styleOverride?: StyleOverride, link?: string): Promise<void> {
 
         let c4Type = type
         let label = ''
@@ -174,6 +176,10 @@ class Mx {
                 break;
         }
 
+        // Tag / UpdateElementStyle colour overrides push the shape toward what
+        // PlantUML would render. Base style is untouched when no override.
+        style = StyleParser.applyOverride(style, styleOverride)
+
         const t: c4 = {
             $: {
                 placeholders: 1,
@@ -182,7 +188,8 @@ class Mx {
                 c4Technology: technology || '',
                 c4Description: description || '',
                 label,
-                id: alias
+                id: alias,
+                ...(link ? { link } : {})
             },
             MxCell: {
                 $: {
@@ -198,7 +205,7 @@ class Mx {
         object.push(t);
     }
 
-    async addMxC4Relationship(geometry: MxGeometry, source: string, target: string, type: string, name: string, technology?: string, description?: string, bidirectional: boolean = false): Promise<void> {
+    async addMxC4Relationship(geometry: MxGeometry, source: string, target: string, type: string, name: string, technology?: string, description?: string, bidirectional: boolean = false, styleOverride?: StyleOverride): Promise<void> {
 
         // Bidirectional rels get arrowheads on BOTH ends (startArrow+endArrow).
         // The existing Relastionship.style() sets endArrow=blockThin; we override
@@ -207,6 +214,8 @@ class Mx {
         if (bidirectional) {
             style = style + ';startArrow=blockThin;startFill=1'
         }
+        // AddRelTag / UpdateRelStyle colour + dashed overrides.
+        style = StyleParser.applyOverride(style, styleOverride)
 
         const t: c4 = {
             $: {
