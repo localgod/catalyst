@@ -180,7 +180,7 @@ PlantUML and draw.io use different layout engines, so a rendered `.puml` and
 the converted `.drawio` are **never pixel-identical** even for a perfect
 conversion. Correctness is therefore guaranteed structurally, not visually:
 
-- **Structural parity** (`tests/parity.test.mjs`) — for every fixture
+- **Structural parity** (`tests/parity.test.mts`) — for every fixture
   (including `tests/fixtures/c4-exhaustive.puml`, which exercises every
   C4-PlantUML primitive in [`docs/C4-COVERAGE.md`](docs/C4-COVERAGE.md)):
   every parsed entity emits a draw.io shape with a matching `c4Type`, every
@@ -190,12 +190,16 @@ conversion. Correctness is therefore guaranteed structurally, not visually:
 - **Drawio structural snapshot** (`tests/golden.test.mjs`) — a deterministic,
   same-engine regression gate (committed fingerprints under `tests/golden/`).
   Regenerate intentional changes with `npm run golden:update`.
+- **Layout quality** (`tests/layout-quality.test.mts`) — every leaf shape is
+  at least the conventional C4 element-box size for its type and no two leaf
+  shapes overlap, so the rendered diagram does not cram. Catches under-sizing
+  that the structural gates (coordinate-independent by design) cannot.
 - **Visual proof** (`npm run render-compare` / `make render-compare`) — renders
   the source `.puml` (PlantUML) and the catalyst `.drawio` (drawio-export)
   side by side for human review. Requires `java` + `docker`; **not** a CI gate.
 
-Current coverage: see the CI coverage report (170+ tests across unit, parity
-and snapshot suites).
+Current: **181 tests** across unit, parity, golden-snapshot and
+layout-quality suites; 85% coverage thresholds enforced in CI.
 
 ## Why Convert?
 
