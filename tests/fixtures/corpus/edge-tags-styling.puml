@@ -1,0 +1,11 @@
+@startuml edge-tags-styling
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Edge cases — tags, UpdateRelStyle, dashed
+AddElementTag("critical", $bgColor="#c0392b", $fontColor="#ffffff")
+AddRelTag("async", $lineColor="#8e44ad", $lineStyle=DashedLine())
+System(a, "Gateway")
+System(b, "Core", "Mission critical", $tags="critical")
+System(c, "Audit Log")
+Rel(a, b, "sync call", "REST")
+Rel(b, c, "emits events", "Kafka", $tags="async")
+@enduml

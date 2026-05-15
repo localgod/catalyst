@@ -1,0 +1,11 @@
+@startuml topology-disconnected
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Context.puml
+title Topology — disconnected components
+System(a1, "Auth Service")
+System(a2, "Token Store")
+Rel(a1, a2, "reads/writes")
+System(b1, "Batch Reporter")
+System(b2, "Data Lake")
+Rel(b1, b2, "scans")
+System(lonely, "Standalone Cron")
+@enduml

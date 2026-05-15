@@ -222,7 +222,11 @@ class Mx {
                 placeholders: 1,
                 c4Name: name,
                 c4Type: type,
-                c4Technology: technology || '',
+                // Pre-bracket the technology in the VALUE so the label template
+                // (which is just `%c4Technology%`, no literal brackets) renders
+                // "[HTTPS]" when present and an empty <div> when absent — never
+                // a bare "[]" tofu box. See Relastionship.label().
+                c4Technology: technology ? `[${technology}]` : '',
                 c4Description: description || '',
                 label: await Relastionship.label()
             },
@@ -255,7 +259,18 @@ class Mx {
     }
 
     async generate(): Promise<string> {
-        return this.replaceKeysWithValue(this.tags, (new xml2js.Builder({ headless: true }).buildObject(this.doc)).replaceAll('&amp;', '&'))
+        // The c4 label templates are PRE-encoded to HTML entities
+        // (encodeHtmlEntities: < -> &lt;, & -> &amp;, ...) so draw.io renders
+        // them as HTML. xml2js then encodes the leading `&` of each entity ref
+        // again, double-encoding `&lt;` -> `&amp;lt;` etc. The old code undid
+        // this with a blanket `.replaceAll('&amp;','&')` — which ALSO turned a
+        // genuine `&` in a label/description (xml2js: `&` -> `&amp;`) back into
+        // a raw `&`, emitting INVALID XML (draw.io's strict loader rejects a
+        // bare `&` in an attribute). Reverse ONLY the double-encoded entity
+        // refs the pre-encoder produced; leave a real `&amp;` intact.
+        const xml = new xml2js.Builder({ headless: true }).buildObject(this.doc)
+            .replace(/&amp;(lt|gt|quot|amp|#39);/g, '&$1;')
+        return this.replaceKeysWithValue(this.tags, xml)
     }
 }
 

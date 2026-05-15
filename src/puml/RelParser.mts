@@ -45,7 +45,13 @@ class RelParser {
         //
         // The 4th positional arg (technology/description) is optional — 3-arg
         // `Rel(src, tgt, "label")` is equally valid in C4-PlantUML.
-        const relationPattern = /(RelIndex(?:_Back)?(?:_Neighbor)?(?:_U|_D|_L|_R|_Up|_Down|_Left|_Right)?|BiRel(?:_Neighbor)?(?:_U|_D|_L|_R|_Up|_Down|_Left|_Right)?|Rel(?:_Back)?(?:_Neighbor)?(?:_U|_D|_L|_R|_Up|_Down|_Left|_Right)?)\(\s*([^,\s)]+)\s*,\s*([^,\s)]+)\s*,\s*(?:(\d+)\s*,\s*)?"([^"]*)"(?:\s*,\s*"([^"]*)")?[^)]*\)/g;
+        // `\(\s*(?:\d+\s*,\s*)?` — RelIndex($index, $from, $to, $label) carries
+        // its numeric index as the FIRST arg; consume+discard it here (leading,
+        // non-capturing) so $from/$to land in groups 2/3. The later
+        // `(?:(\d+)\s*,\s*)?` (group 4) is kept for capture-group stability
+        // (RelParser uses match[1..3,5,6]); it is a harmless no-op for every
+        // primitive now that the leading index is handled.
+        const relationPattern = /(RelIndex(?:_Back)?(?:_Neighbor)?(?:_U|_D|_L|_R|_Up|_Down|_Left|_Right)?|BiRel(?:_Neighbor)?(?:_U|_D|_L|_R|_Up|_Down|_Left|_Right)?|Rel(?:_Back)?(?:_Neighbor)?(?:_U|_D|_L|_R|_Up|_Down|_Left|_Right)?)\(\s*(?:\d+\s*,\s*)?([^,\s)]+)\s*,\s*([^,\s)]+)\s*,\s*(?:(\d+)\s*,\s*)?"([^"]*)"(?:\s*,\s*"([^"]*)")?[^)]*\)/g;
 
         let match;
         while ((match = relationPattern.exec(pumlString)) !== null) {

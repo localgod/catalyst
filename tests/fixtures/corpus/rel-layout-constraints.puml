@@ -1,0 +1,12 @@
+@startuml rel-layout-constraints
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Relationships — Lay_ constraints produce NO visible edge
+System(a, "Alpha")
+System(b, "Beta")
+System(c, "Gamma")
+System(d, "Delta")
+Rel(a, b, "real edge")
+Lay_D(a, c)
+Lay_R(b, d)
+Lay_Distance(c, d, 2)
+@enduml

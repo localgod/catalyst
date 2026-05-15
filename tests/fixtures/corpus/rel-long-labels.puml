@@ -1,0 +1,7 @@
+@startuml rel-long-labels
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Relationships — very long labels
+System(a, "Order Service")
+System(b, "Payment Service")
+Rel(a, b, "submits a payment authorization request and waits synchronously for settlement confirmation", "HTTPS / JSON over mutually-authenticated TLS 1.3")
+@enduml

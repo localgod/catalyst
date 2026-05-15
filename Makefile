@@ -5,6 +5,8 @@ DRAWIO_EXPORT_IMAGE ?= rlespinasse/drawio-export:latest
 DRAWIO_EXPORT_SCALE ?= 2
 RENDER_SRC          ?= tests/fixtures/c4-exhaustive.puml
 RENDER_OUT          ?= build/render-compare
+CORPUS_DIR          ?= tests/fixtures/corpus
+GALLERY_OUT         ?= docs/gallery
 
 .DEFAULT_GOAL := help
 
@@ -39,6 +41,15 @@ render-compare: build ## Visual proof: render SRC puml + catalyst drawio side-by
 	DRAWIO_EXPORT_IMAGE=$(DRAWIO_EXPORT_IMAGE) \
 	DRAWIO_EXPORT_SCALE=$(DRAWIO_EXPORT_SCALE) \
 	node scripts/render-compare.mjs "$(RENDER_SRC)" "$(RENDER_OUT)"
+
+.PHONY: gallery
+gallery: build ## Dual-render the use-case corpus into docs/gallery (needs java+docker)
+	PLANTUML_VERSION=$(PLANTUML_VERSION) \
+	DRAWIO_EXPORT_IMAGE=$(DRAWIO_EXPORT_IMAGE) \
+	DRAWIO_EXPORT_SCALE=$(DRAWIO_EXPORT_SCALE) \
+	CORPUS_DIR=$(CORPUS_DIR) \
+	GALLERY_OUT=$(GALLERY_OUT) \
+	node scripts/gallery.mjs
 
 .PHONY: ci
 ci: build lint test ## Local CI pipeline (build + lint + tests)

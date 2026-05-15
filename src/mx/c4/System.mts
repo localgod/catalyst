@@ -1,7 +1,7 @@
 class System {
     static async label() {
         // Build HTML directly with inline styles
-        const html = `<div style="font-size:16px;font-weight:bold;">%c4Name%</div><div>[%c4Type%:%c4Technology%]</div><div style="font-size:11px;color:#cccccc;">%c4Description%</div>`;
+        const html = `<div style="font-size:16px;font-weight:bold;">%c4Name%</div><div>[%c4Type%]</div><div style="font-size:11px;color:#cccccc;">%c4Description%</div>`;
         
         // Simple whitespace collapse
         const minifiedHtml = html.replace(/>\s+</g, '><');

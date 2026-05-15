@@ -1,0 +1,10 @@
+@startuml rel-tech-vs-notech
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Relationships — with vs without technology (regression: no "[]" tofu)
+System(a, "Producer")
+System(b, "Consumer")
+System(c, "Auditor")
+Rel(a, b, "verb only — NO technology")
+Rel(a, c, "verb with technology", "Kafka")
+Rel_Back(c, a, "back-rel no tech")
+@enduml

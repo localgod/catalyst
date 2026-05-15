@@ -1,0 +1,11 @@
+@startuml level-dynamic
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Dynamic.puml
+title C4 Level — Dynamic (numbered RelIndex)
+Person(user, "User")
+System(web, "Web App")
+System(api, "API")
+SystemDb(db, "Database")
+RelIndex(1, user, web, "opens")
+RelIndex(2, web, api, "GET /orders", "JSON/HTTPS")
+RelIndex(3, api, db, "SELECT", "SQL")
+@enduml

@@ -1,7 +1,11 @@
 class Relastionship {
     static async label() {
-        // Build HTML directly with inline styles
-        const html = `<div style="text-align: left;"><div style="text-align: center;font-weight:bold;">%c4Description%</div><div style="text-align: center">[%c4Technology%]</div></div>`;
+        // Bold line = the relationship verb (c4Name, e.g. "Uses"); second line
+        // = the technology. The bracket is pre-applied to the c4Technology
+        // VALUE in Mx.addMxC4Relationship (so an absent technology yields an
+        // empty <div>, not a literal "[]" tofu box). Do NOT hardcode the
+        // bracket in this template — that was the cause of the "[]" artifact.
+        const html = `<div style="text-align: center;font-weight:bold;">%c4Name%</div><div style="text-align: center;">%c4Technology%</div>`;
         
         // Simple whitespace collapse
         const minifiedHtml = html.replace(/>\s+</g, '><');
@@ -28,7 +32,6 @@ class Relastionship {
             strokeWidth: 1,
             endFill: 1,
             strokeColor: '#828282',
-            elbow: 'vertical',
             metaEdit: 1,
             endSize: 14,
             startSize: 14,
@@ -36,10 +39,14 @@ class Relastionship {
             jumpSize: 16,
             rounded: 0,
             edgeStyle: 'orthogonalEdgeStyle',
-            entryX: 0.5,
-            entryY: 1,
-            entryDx: 0,
-            entryDy: 0,
+            // NO hardcoded entryX/entryY/exitX/exitY. catalyst supports TB/BT/
+            // LR/RL layouts; a fixed entry point (the old entryY=1 = "enter the
+            // target's bottom") forced a left-side dog-leg with an upward
+            // arrowhead for ELK's default top-down placement. Letting drawio's
+            // orthogonal router pick the attach side from geometry — and follow
+            // the ELK-computed waypoints when present — is direction-agnostic
+            // and matches the source PlantUML routing. `elbow` was also dropped:
+            // it only applies to elbowEdgeStyle, a no-op here.
         }
 
         return Object.entries(styles).map(([key, value]) => `${key}=${value}`).join(';');

@@ -13,7 +13,10 @@ describe('System', () => {
     // Check that placeholders are present
     expect(label).toContain('%c4Name%');
     expect(label).toContain('%c4Type%');
-    expect(label).toContain('%c4Technology%');
+    // C4-PlantUML System has NO technology parameter — the template renders
+    // [%c4Type%] (not [%c4Type%:%c4Technology%]); a System with an empty
+    // technology used to render a stray "[System:]".
+    expect(label).not.toContain('%c4Technology%');
     expect(label).toContain('%c4Description%');
     
     // Check that styles are applied

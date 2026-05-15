@@ -1,0 +1,17 @@
+@startuml topology-deep-nesting
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Context.puml
+title Topology — deep boundary nesting
+Enterprise_Boundary(ent, "Acme Corp") {
+  System_Boundary(plat, "Platform") {
+    System_Boundary(core, "Core Services") {
+      System(auth, "Auth", "OIDC provider")
+      System(usr, "Users", "Profile store")
+    }
+    System(gw, "API Gateway")
+  }
+  Person(admin, "Platform Admin")
+}
+Rel(admin, gw, "operates")
+Rel(gw, auth, "delegates")
+Rel(auth, usr, "looks up")
+@enduml
