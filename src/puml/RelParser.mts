@@ -19,8 +19,15 @@ class RelParser {
         this.points = []
     }
 
-    static getRelations(pumlString: string): Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean, tags?: string }> {
-        const relations: Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean, tags?: string }> = [];
+    /** C4 directional intent extracted from a Rel/BiRel primitive suffix. */
+    private static directionOf(primitive: string): 'U' | 'D' | 'L' | 'R' | undefined {
+        const m = /_(Up|Down|Left|Right|U|D|L|R)(?:_|$)/.exec(primitive);
+        if (!m) return undefined;
+        return ({ Up: 'U', U: 'U', Down: 'D', D: 'D', Left: 'L', L: 'L', Right: 'R', R: 'R' } as const)[m[1]];
+    }
+
+    static getRelations(pumlString: string): Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean, tags?: string, direction?: 'U' | 'D' | 'L' | 'R' }> {
+        const relations: Array<{ source: string, target: string, label: string, description: string, bidirectional: boolean, tags?: string, direction?: 'U' | 'D' | 'L' | 'R' }> = [];
 
         // Cover the full C4-PlantUML relationship surface. The leading
         // (?<primitive>...) capture lets us tell BiRel apart so the renderer
@@ -61,10 +68,38 @@ class RelParser {
                 description,
                 bidirectional,
                 tags,
+                direction: RelParser.directionOf(primitive),
             });
         }
 
         return relations;
+    }
+
+    /**
+     * Layout-only constraints: `Lay_U/D/L/R`, `Lay_Up/Down/Left/Right`,
+     * `Lay_Distance(a,b,n)`. These produce NO visible connector — they only
+     * bias placement. Returned separately so the renderer never emits an edge
+     * for them; the LayoutEngine feeds them to the layout engine (ELK) as invisible
+     * ranking edges. `distance` (Lay_Distance 3rd arg) is carried through.
+     */
+    static getLayoutConstraints(pumlString: string): Array<{ source: string, target: string, direction?: 'U' | 'D' | 'L' | 'R', distance?: number }> {
+        const out: Array<{ source: string, target: string, direction?: 'U' | 'D' | 'L' | 'R', distance?: number }> = [];
+        const pattern = /\bLay_(U|D|L|R|Up|Down|Left|Right|Distance)\(\s*([^,\s)]+)\s*,\s*([^,\s)]+)\s*(?:,\s*(\d+)\s*)?\)/g;
+        let m;
+        while ((m = pattern.exec(pumlString)) !== null) {
+            const kind = m[1];
+            const entry: { source: string, target: string, direction?: 'U' | 'D' | 'L' | 'R', distance?: number } = {
+                source: m[2].trim(),
+                target: m[3].trim(),
+            };
+            if (kind === 'Distance') {
+                if (m[4] !== undefined) entry.distance = parseInt(m[4], 10);
+            } else {
+                entry.direction = ({ Up: 'U', U: 'U', Down: 'D', D: 'D', Left: 'L', L: 'L', Right: 'R', R: 'R' } as const)[kind];
+            }
+            out.push(entry);
+        }
+        return out;
     }
 
     parsePathCoordinates(path: string): ParsedCoordinates | null {

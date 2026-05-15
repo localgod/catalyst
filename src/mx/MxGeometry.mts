@@ -6,6 +6,8 @@ class MxGeometry  {
         y?: number;
         width?: number;
         height?: number;
+        /** drawio edge geometry is relative; waypoints live in <Array as="points">. */
+        relative?: number;
         as: string;
     }
 

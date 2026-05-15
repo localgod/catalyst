@@ -168,3 +168,47 @@ describe('RelParser', () => {
     });
   });
 });
+
+describe('RelParser — directional intent (L1)', () => {
+  it('extracts direction from short + long Rel/BiRel variants', () => {
+    const puml = [
+      'Rel(a, b, "plain")',
+      'Rel_U(a, c, "short up")',
+      'Rel_Down(a, d, "long down")',
+      'Rel_L(b, c, "short left")',
+      'BiRel_Right(c, d, "bi right")',
+      'Rel_Back(d, a, "back has no dir")',
+    ].join('\n');
+    const rels = RelParser.getRelations(puml);
+    const byLabel = Object.fromEntries(rels.map(r => [r.label, r.direction]));
+    expect(byLabel['plain']).toBeUndefined();
+    expect(byLabel['short up']).toBe('U');
+    expect(byLabel['long down']).toBe('D');
+    expect(byLabel['short left']).toBe('L');
+    expect(byLabel['bi right']).toBe('R');
+    expect(byLabel['back has no dir']).toBeUndefined();
+  });
+
+  it('parses Lay_* as layout-only constraints (no visible relation)', () => {
+    const puml = [
+      'Rel(a, b, "visible")',
+      'Lay_U(a, c)',
+      'Lay_Down(b, d)',
+      'Lay_Distance(a, d, 3)',
+    ].join('\n');
+
+    // Lay_* must NOT appear as relations (they draw no connector).
+    expect(RelParser.getRelations(puml).map(r => r.label)).toEqual(['visible']);
+
+    const lc = RelParser.getLayoutConstraints(puml);
+    expect(lc).toEqual([
+      { source: 'a', target: 'c', direction: 'U' },
+      { source: 'b', target: 'd', direction: 'D' },
+      { source: 'a', target: 'd', distance: 3 },
+    ]);
+  });
+
+  it('returns no constraints when there are no Lay_* directives', () => {
+    expect(RelParser.getLayoutConstraints('Rel(a, b, "x")')).toEqual([]);
+  });
+});

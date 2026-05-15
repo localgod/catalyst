@@ -4,7 +4,15 @@
   <img src="logo.svg" width="100" height="100" alt="Catalyst Logo">
 </div>
 
-[![CI](https://github.com/localgod/catalyst/actions/workflows/ci.yml/badge.svg)](https://github.com/localgod/catalyst/actions/workflows/ci.yml)
+[![CI](https://github.com/AndriyKalashnykov/catalyst/actions/workflows/ci.yml/badge.svg)](https://github.com/AndriyKalashnykov/catalyst/actions/workflows/ci.yml)
+
+> **Project status:** independently maintained. This project originated as a
+> fork of [localgod/catalyst](https://github.com/localgod/catalyst) (MIT) but
+> has substantially diverged — most notably the layout engine was replaced
+> (dagre → elkjs), with real font-metric node sizing, spec-driven algorithm
+> selection, and structural parity/snapshot test gates. It is **not** tracking
+> upstream (which is inactive); upstream attribution is retained in
+> [LICENSE](LICENSE).
 
 ## Overview
 
@@ -12,8 +20,10 @@ Catalyst is a JavaScript library designed to facilitate the conversion of
 C4 diagrams written in [PlantUML](https://plantuml.com/) format into [draw.io](https://draw.io)
 C4 diagrams. While PlantUML itself is not required as a runtime dependency,
 the library parses diagrams written in PlantUML's C4 syntax (.puml files).
-This project uses the Dagre layout engine for fast, pure JavaScript
-layout calculation without external dependencies.
+This project uses the ELK (elkjs) layout engine: a layered algorithm for
+hierarchical C4 diagrams (Container/Component/Deployment) and a force
+algorithm for hub-and-spoke Context diagrams, selected per the C4 spec
+level of the source.
 
 ## Installation
 
@@ -126,8 +136,9 @@ transition from PlantUML's text-based format to draw.io's graphical capabilities
 - **PlantUML C4 Format Support:** The library parses and converts C4 diagrams
 written in PlantUML syntax (.puml files) without requiring PlantUML runtime.
 
-- **Fast Layout Engine:** Uses Dagre for pure JavaScript layout calculation,
-eliminating external dependencies and providing fast performance.
+- **ELK Layout Engine:** Uses elkjs (Eclipse Layout Kernel) — layered for
+hierarchical diagrams, force for Context-level hub-and-spoke diagrams —
+with real font-metric node sizing and routed connectors.
 
 - **draw.io Integration:** The resulting draw.io diagrams are seamlessly
 integrated with draw.io's native features, allowing users to further enhance and
@@ -212,7 +223,11 @@ communication of architectural concepts.
 ## License
 
 This project is released under the [MIT License](LICENSE). You are free to use,
-modify, and distribute the software as per the terms of the license.
+modify, and distribute the software as per the terms of the license. It
+originated from [localgod/catalyst](https://github.com/localgod/catalyst);
+the original copyright and license terms are retained in [LICENSE](LICENSE).
+The bundled Liberation Sans fonts (used for text measurement) are under the
+SIL Open Font License 1.1 — see [src/assets/fonts/LICENSE](src/assets/fonts/LICENSE).
 
 ## Feedback and Support
 

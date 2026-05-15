@@ -22,7 +22,8 @@ vi.mock('../src/mx/Mx.mjs', () => ({
 
 vi.mock('../src/puml/RelParser.mjs', () => ({
   RelParser: {
-    getRelations: vi.fn().mockReturnValue([])
+    getRelations: vi.fn().mockReturnValue([]),
+    getLayoutConstraints: vi.fn().mockReturnValue([])
   }
 }));
 

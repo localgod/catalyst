@@ -20,7 +20,7 @@ Rel(AX, AIF, "Uses")
 <div>
 <h3>draw.io Output</h3>
 
-- **Fast Dagre Layout**: Pure JavaScript layout calculation
+- **ELK Layout**: layered + force layout via elkjs
 - **No External Dependencies**: No Java or PlantUML runtime required  
 - **Native draw.io Format**: Fully compatible with draw.io editor
 - **Proper C4 Styling**: Maintains C4 visual standards

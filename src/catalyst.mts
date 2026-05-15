@@ -1,5 +1,6 @@
 import { EntityParser, EntityDescriptor } from "./puml/EntityParser.mjs"
 import { Mx, MxGeometry } from './mx/Mx.mjs'
+import { MxPoint } from './mx/MxPoint.mjs'
 import { RelParser } from './puml/RelParser.mjs'
 import { LayoutEngine, LayoutResult } from './layout/LayoutEngine.mjs'
 import { StyleParser } from './puml/StyleParser.mjs'
@@ -30,39 +31,21 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
   const mx = new Mx(layoutData.height || 600, layoutData.width || 800)
   const parser = new EntityParser()
 
-  // Build alias → parent-alias map by walking the entity hierarchy once.
-  // Used to preserve drawio containment (e.g. Container inside System_Boundary).
-  const parentOf = new Map<string, string>()
-  const walk = (entities: EntityDescriptor[], parent?: string) => {
-    for (const e of entities) {
-      if (parent) parentOf.set(e.alias, parent)
-      if (e.children) walk(e.children, e.alias)
-    }
-  }
-  walk(pumlElements)
+  // LayoutEngine (elkjs) returns every shape in ONE absolute coordinate
+  // space (ELK parent-relative top-left coords accumulated to absolute).
+  // Every cell is emitted flat under root ("1"); a boundary visually
+  // contains its children because its computed box encloses their absolute
+  // positions. (drawio parent-relative coords would double-offset against
+  // the absolute layout output — flat + absolute is the consistent model.)
 
   // Every entity alias that actually got emitted as a drawio vertex/cluster.
   // Used to guarantee (and surface) edge-endpoint resolution: a relationship
   // whose source/target isn't in here would be an orphan connector in drawio.
   const emittedIds = new Set<string>()
 
-  // Handle nodes from layout data. Pass every valid C4 type through — Mx.addMxC4's
-  // switch decides the shape/style. `default: break` here would drop Persons,
-  // System_Ext, ContainerDb, etc.
-  if (layoutData.nodes && Array.isArray(layoutData.nodes)) {
-    for (const node of layoutData.nodes) {
-      const g = new MxGeometry(node.height, node.width, node.x, node.y)
-      const info = parser.getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', node.id)
-
-      if (info) {
-        await mx.addMxC4(node.id, g, info.type, info.label, info.technology, info.description, parentOf.get(node.id), overrideFor(info.type, info.tags, styles), info.link)
-        emittedIds.add(node.id)
-      }
-    }
-  }
-
-  // Handle clusters from layout data — same treatment. Boundaries land here
-  // (they're stack frames in the PUML and always have children).
+  // Clusters (boundaries / Deployment_Node) FIRST so they render behind their
+  // children (drawio z-order = document order). ELK-computed box encloses
+  // the children's absolute positions; emitted flat (parent "1").
   if (layoutData.clusters && Array.isArray(layoutData.clusters)) {
     for (const cluster of layoutData.clusters) {
       const g = new MxGeometry(cluster.height, cluster.width, cluster.x, cluster.y)
@@ -80,19 +63,31 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
           }
           ovr = Object.keys(b).length ? b : undefined
         }
-        await mx.addMxC4(cluster.id, g, info.type, info.label, info.technology, info.description, parentOf.get(cluster.id), ovr, info.link)
+        await mx.addMxC4(cluster.id, g, info.type, info.label, info.technology, info.description, undefined, ovr, info.link)
         emittedIds.add(cluster.id)
       }
     }
   }
 
+  // Leaf shapes on top. Pass every valid C4 type through — Mx.addMxC4's
+  // switch decides the shape/style.
+  if (layoutData.nodes && Array.isArray(layoutData.nodes)) {
+    for (const node of layoutData.nodes) {
+      const g = new MxGeometry(node.height, node.width, node.x, node.y)
+      const info = parser.getObjectWithPropertyAndValueInHierarchy(pumlElements, 'alias', node.id)
+
+      if (info) {
+        await mx.addMxC4(node.id, g, info.type, info.label, info.technology, info.description, undefined, overrideFor(info.type, info.tags, styles), info.link)
+        emittedIds.add(node.id)
+      }
+    }
+  }
+
   // Emit ONE drawio edge per parsed relation — driven by pumlRelations, NOT by
-  // the (deduped) dagre edge set. dagre's multigraph keeps parallel edges, but
-  // correlating layout geometry back to relations is best-effort only; the
-  // hard guarantee is "no relation is silently dropped", which means iterating
-  // the relations themselves. Layout points are looked up by the `rel<index>`
-  // edge name when present, else a default line geometry is used (drawio
-  // re-routes edges from source/target cells anyway).
+  // the layout engine's edge set. The hard guarantee is "no relation is
+  // silently dropped", which means iterating the relations themselves. Layout
+  // points are looked up by the `rel<index>` edge name when present, else a
+  // default geometry is used (drawio re-routes from source/target cells).
   const layoutEdgeByRelIdx = new Map<number, { x: number; y: number }[]>()
   if (layoutData.edges && Array.isArray(layoutData.edges)) {
     for (const e of layoutData.edges) {
@@ -102,12 +97,25 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
       }
     }
   }
+  // L2: ELK computes a routed polyline (edge sections) in the SAME absolute
+  // space as the emitted shapes (LayoutEngine accumulates ELK's parent-
+  // relative coords to absolute). Thread the INTERIOR points (drop the
+  // first/last node-attach points — drawio anchors to the cells itself) as
+  // drawio waypoints. Skipped when an endpoint is a
+  // cluster: L4 reroutes such ranking edges onto a leaf, so that polyline
+  // would not match the visible boundary endpoints — let drawio auto-route.
+  const clusterIds = new Set<string>((layoutData.clusters ?? []).map(c => c.id))
 
   for (let i = 0; i < pumlRelations.length; i++) {
     const rel = pumlRelations[i]
-    const points = layoutEdgeByRelIdx.get(i) ?? [{ x: 0, y: 0 }, { x: 100, y: 100 }]
-    const firstPoint = points[0] ?? { x: 0, y: 0 }
-    const g = new MxGeometry(20, 100, firstPoint.x, firstPoint.y)
+    const g = new MxGeometry()
+    g.$.relative = 1
+    const poly = layoutEdgeByRelIdx.get(i)
+    if (poly && poly.length > 2 && !clusterIds.has(rel.source) && !clusterIds.has(rel.target)) {
+      for (const p of poly.slice(1, -1)) {
+        g.addArrayPoint(new MxPoint(Math.round(p.x), Math.round(p.y)))
+      }
+    }
     const relOvr: StyleOverride = { ...styles.relDefault }
     for (const tag of (rel.tags ?? '').split('+').map(s => s.trim()).filter(Boolean)) {
       if (styles.relTags.has(tag)) Object.assign(relOvr, styles.relTags.get(tag))
@@ -145,6 +153,7 @@ export class Catalyst {
   static async convert(pumlContent: string, options: CatalystOptions = {}): Promise<string> {
     const elements = new EntityParser().parse(pumlContent)
     const relations = RelParser.getRelations(pumlContent)
+    const layoutConstraints = RelParser.getLayoutConstraints(pumlContent)
     const styles = StyleParser.parse(pumlContent)
 
     const layoutOptions = {
@@ -156,7 +165,7 @@ export class Catalyst {
       marginy: options.marginy || 20
     }
 
-    const layoutData = await LayoutEngine.calculateLayout(elements, relations, layoutOptions)
+    const layoutData = await LayoutEngine.calculateLayout(elements, relations, layoutOptions, layoutConstraints)
     return await layoutData2mx(layoutData, elements, relations, styles)
   }
 

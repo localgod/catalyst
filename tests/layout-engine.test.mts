@@ -1,381 +1,188 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { LayoutEngine } from '../src/layout/LayoutEngine.mjs'
 
-describe('LayoutEngine', () => {
-  let layoutEngine: LayoutEngine
-  
-  const testEntities = [
-    {
-      type: 'System',
-      alias: 'SYS1',
-      label: 'System A',
-      technology: 'System Tech',
-      description: 'System description',
-      children: [
-        {
-          type: 'Container',
-          alias: 'CONT1',
-          label: 'Container A',
-          technology: 'Container Tech',
-          description: 'Container description',
-          children: [
-            {
-              type: 'Component',
-              alias: 'COMP1',
-              label: 'Component A',
-              technology: 'Component Tech',
-              description: 'Component description'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      type: 'System',
-      alias: 'SYS2',
-      label: 'System B',
-      technology: 'System Tech',
-      description: 'System description',
-      children: [
-        {
-          type: 'Container',
-          alias: 'CONT2',
-          label: 'Container B',
-          technology: 'Container Tech',
-          description: 'Container description',
-          children: [
-            {
-              type: 'Component',
-              alias: 'COMP2',
-              label: 'Component B',
-              technology: 'Component Tech',
-              description: 'Component description'
-            }
-          ]
-        }
-      ]
-    }
-  ]
+// Behavioral tests for the elkjs-based LayoutEngine. They assert the public
+// contract (positions, hierarchy, edges) — NOT engine internals — so they
+// stay valid across layout-algorithm changes. Coordinates are absolute
+// top-left (ELK convention, accumulated from parent-relative).
 
-  const testRelations = [
-    {
-      source: 'COMP1',
-      target: 'COMP2',
-      label: 'Uses',
-      description: 'Component relationship'
-    },
-    {
-      source: 'SYS1',
-      target: 'SYS2',
-      label: 'Integrates with',
-      description: 'System relationship'
-    }
-  ]
-
-  beforeEach(() => {
-    layoutEngine = new LayoutEngine()
-  })
-
-  describe('initialization', () => {
-    it('should create a new LayoutEngine instance', () => {
-      expect(layoutEngine).toBeInstanceOf(LayoutEngine)
-    })
-
-    it('should have default layout options', () => {
-      // Test that we can set layout options without errors
-      expect(() => {
-        layoutEngine.setLayoutOptions({
-          rankdir: 'TB',
-          nodesep: 50,
-          edgesep: 10
-        })
-      }).not.toThrow()
-    })
-  })
-
-  describe('node management', () => {
-    it('should add nodes from entities without errors', () => {
-      expect(() => {
-        layoutEngine.addNodes(testEntities)
-      }).not.toThrow()
-    })
-
-    it('should handle empty entity arrays', () => {
-      expect(() => {
-        layoutEngine.addNodes([])
-      }).not.toThrow()
-    })
-
-    it('should handle entities without children', () => {
-      const simpleEntities = [
-        {
-          type: 'Component',
-          alias: 'SIMPLE',
-          label: 'Simple Component',
-          technology: 'Tech',
-          description: 'Description'
-        }
-      ]
-      
-      expect(() => {
-        layoutEngine.addNodes(simpleEntities)
-      }).not.toThrow()
-    })
-  })
-
-  describe('edge management', () => {
-    it('should add edges from relations without errors', () => {
-      layoutEngine.addNodes(testEntities)
-      
-      expect(() => {
-        layoutEngine.addEdges(testRelations)
-      }).not.toThrow()
-    })
-
-    it('should handle empty relations arrays', () => {
-      layoutEngine.addNodes(testEntities)
-      
-      expect(() => {
-        layoutEngine.addEdges([])
-      }).not.toThrow()
-    })
-  })
-
-  describe('layout calculation', () => {
-    it('should calculate layout and return valid result structure', () => {
-      layoutEngine.addNodes(testEntities)
-      layoutEngine.addEdges(testRelations)
-      
-      const result = layoutEngine.calculateLayout()
-      
-      // Verify result structure
-      expect(result).toHaveProperty('nodes')
-      expect(result).toHaveProperty('edges')
-      expect(result).toHaveProperty('clusters')
-      expect(result).toHaveProperty('width')
-      expect(result).toHaveProperty('height')
-      
-      // Verify types
-      expect(Array.isArray(result.nodes)).toBe(true)
-      expect(Array.isArray(result.edges)).toBe(true)
-      expect(Array.isArray(result.clusters)).toBe(true)
-      expect(typeof result.width).toBe('number')
-      expect(typeof result.height).toBe('number')
-      
-      // Verify positive dimensions
-      expect(result.width).toBeGreaterThan(0)
-      expect(result.height).toBeGreaterThan(0)
-    })
-
-    it('should return positioned nodes with required properties', () => {
-      layoutEngine.addNodes(testEntities)
-      
-      const result = layoutEngine.calculateLayout()
-      
-      // Should have leaf nodes (components)
-      expect(result.nodes.length).toBeGreaterThan(0)
-      
-      result.nodes.forEach(node => {
-        expect(node).toHaveProperty('id')
-        expect(node).toHaveProperty('x')
-        expect(node).toHaveProperty('y')
-        expect(node).toHaveProperty('width')
-        expect(node).toHaveProperty('height')
-        
-        // Verify positioning data is valid
-        expect(typeof node.x).toBe('number')
-        expect(typeof node.y).toBe('number')
-        expect(node.width).toBeGreaterThan(0)
-        expect(node.height).toBeGreaterThan(0)
-      })
-    })
-
-    it('should return clusters with proper hierarchy', () => {
-      layoutEngine.addNodes(testEntities)
-      
-      const result = layoutEngine.calculateLayout()
-      
-      // Should have clusters for systems and containers
-      expect(result.clusters.length).toBeGreaterThan(0)
-      
-      result.clusters.forEach(cluster => {
-        expect(cluster).toHaveProperty('id')
-        expect(cluster).toHaveProperty('x')
-        expect(cluster).toHaveProperty('y')
-        expect(cluster).toHaveProperty('width')
-        expect(cluster).toHaveProperty('height')
-        
-        // Verify positioning data is valid
-        expect(typeof cluster.x).toBe('number')
-        expect(typeof cluster.y).toBe('number')
-        expect(cluster.width).toBeGreaterThan(0)
-        expect(cluster.height).toBeGreaterThan(0)
-      })
-    })
-
-    it('should handle layout with edges', () => {
-      layoutEngine.addNodes(testEntities)
-      layoutEngine.addEdges(testRelations)
-      
-      const result = layoutEngine.calculateLayout()
-      
-      // Should have edges
-      expect(result.edges.length).toBeGreaterThan(0)
-      
-      result.edges.forEach(edge => {
-        expect(edge).toHaveProperty('source')
-        expect(edge).toHaveProperty('target')
-        expect(typeof edge.source).toBe('string')
-        expect(typeof edge.target).toBe('string')
-      })
-    })
-  })
-
-  describe('layout options', () => {
-    it('should accept different layout directions', () => {
-      const directions = ['TB', 'BT', 'LR', 'RL'] as const
-      
-      directions.forEach(direction => {
-        expect(() => {
-          layoutEngine.setLayoutOptions({ rankdir: direction })
-        }).not.toThrow()
-      })
-    })
-
-    it('should accept spacing options', () => {
-      expect(() => {
-        layoutEngine.setLayoutOptions({
-          nodesep: 100,
-          edgesep: 20,
-          ranksep: 80,
-          marginx: 30,
-          marginy: 40
-        })
-      }).not.toThrow()
-    })
-  })
-
-  describe('static factory method', () => {
-    it('should calculate layout using static method', async () => {
-      const result = await LayoutEngine.calculateLayout(testEntities, testRelations, {
-        rankdir: 'TB',
-        nodesep: 50
-      })
-      
-      expect(result).toHaveProperty('nodes')
-      expect(result).toHaveProperty('edges')
-      expect(result).toHaveProperty('clusters')
-      expect(result).toHaveProperty('width')
-      expect(result).toHaveProperty('height')
-      
-      // Verify we get actual layout results
-      expect(result.nodes.length).toBeGreaterThan(0)
-      expect(result.clusters.length).toBeGreaterThan(0)
-    })
-
-    it('should work without options', async () => {
-      const result = await LayoutEngine.calculateLayout(testEntities, testRelations)
-      
-      expect(result).toBeDefined()
-      expect(Array.isArray(result.nodes)).toBe(true)
-      expect(result.nodes.length).toBeGreaterThan(0)
-    })
-
-    it('should handle empty inputs gracefully', async () => {
-      const result = await LayoutEngine.calculateLayout([], [])
-      
-      expect(result).toBeDefined()
-      expect(Array.isArray(result.nodes)).toBe(true)
-      expect(Array.isArray(result.edges)).toBe(true)
-      expect(Array.isArray(result.clusters)).toBe(true)
-    })
-  })
-
-  describe('hierarchical layout', () => {
-    it('should properly handle nested entity structures', () => {
-      const nestedEntities = [
-        {
-          type: 'System',
-          alias: 'NESTED_SYS',
-          label: 'Nested System',
-          technology: 'tech',
-          description: 'desc',
-          children: [
-            {
-              type: 'Container',
-              alias: 'NESTED_CONT',
-              label: 'Nested Container',
-              technology: 'tech',
-              description: 'desc',
-              children: [
-                {
-                  type: 'Component',
-                  alias: 'NESTED_COMP1',
-                  label: 'Nested Component 1',
-                  technology: 'tech',
-                  description: 'desc'
-                },
-                {
-                  type: 'Component',
-                  alias: 'NESTED_COMP2',
-                  label: 'Nested Component 2',
-                  technology: 'tech',
-                  description: 'desc'
-                }
-              ]
-            }
-          ]
-        }
-      ]
-
-      layoutEngine.addNodes(nestedEntities)
-      const result = layoutEngine.calculateLayout()
-      
-      // Should have components as leaf nodes
-      expect(result.nodes.length).toBe(2) // NESTED_COMP1 and NESTED_COMP2
-      
-      // Should have system and container as clusters
-      expect(result.clusters.length).toBe(2) // NESTED_SYS and NESTED_CONT
-      
-      // Verify node IDs
-      const nodeIds = result.nodes.map(n => n.id)
-      expect(nodeIds).toContain('NESTED_COMP1')
-      expect(nodeIds).toContain('NESTED_COMP2')
-      
-      // Verify cluster IDs
-      const clusterIds = result.clusters.map(c => c.id)
-      expect(clusterIds).toContain('NESTED_SYS')
-      expect(clusterIds).toContain('NESTED_CONT')
-    })
-
-    it('should ensure components are positioned within their containers', () => {
-      layoutEngine.addNodes(testEntities)
-      const result = layoutEngine.calculateLayout()
-      
-      // Find a container and its components
-      const container = result.clusters.find(c => c.id === 'CONT1')
-      const component = result.nodes.find(n => n.id === 'COMP1')
-      
-      if (container && component && 
-          container.x !== undefined && container.y !== undefined &&
-          component.x !== undefined && component.y !== undefined) {
-        // Component should be within container bounds (with some tolerance for positioning)
-        const containerLeft = container.x - container.width / 2
-        const containerRight = container.x + container.width / 2
-        const containerTop = container.y - container.height / 2
-        const containerBottom = container.y + container.height / 2
-        
-        const componentLeft = component.x - component.width / 2
-        const componentRight = component.x + component.width / 2
-        const componentTop = component.y - component.height / 2
-        const componentBottom = component.y + component.height / 2
-        
-        // Component should be within container (allowing for some layout tolerance)
-        expect(componentLeft).toBeGreaterThanOrEqual(containerLeft - 10)
-        expect(componentRight).toBeLessThanOrEqual(containerRight + 10)
-        expect(componentTop).toBeGreaterThanOrEqual(containerTop - 10)
-        expect(componentBottom).toBeLessThanOrEqual(containerBottom + 10)
+const entities = [
+  {
+    type: 'System', alias: 'SYS1', label: 'System A',
+    technology: 'Tech', description: 'System description',
+    children: [
+      {
+        type: 'Container', alias: 'CONT1', label: 'Container A',
+        technology: 'Tech', description: 'Container description',
+        children: [
+          { type: 'Component', alias: 'COMP1', label: 'Component A', technology: 'Tech', description: 'desc' }
+        ]
       }
+    ]
+  },
+  { type: 'System', alias: 'SYS2', label: 'System B', technology: 'Tech', description: 'desc' }
+]
+
+const relations = [
+  { source: 'COMP1', target: 'SYS2', label: 'Uses', description: 'rel' }
+]
+
+describe('LayoutEngine (elkjs)', () => {
+  describe('initialization', () => {
+    it('constructs and accepts layout options without throwing', () => {
+      const e = new LayoutEngine()
+      expect(e).toBeInstanceOf(LayoutEngine)
+      expect(() => e.setLayoutOptions({ rankdir: 'TB', nodesep: 50, edgesep: 10, ranksep: 50 })).not.toThrow()
+    })
+
+    it('accepts nodes/edges/constraints without throwing', () => {
+      const e = new LayoutEngine()
+      expect(() => { e.addNodes(entities); e.addEdges(relations); e.addLayoutConstraints([]) }).not.toThrow()
+    })
+  })
+
+  describe('calculateLayout', () => {
+    it('returns the LayoutResult shape', async () => {
+      const r = await LayoutEngine.calculateLayout(entities, relations, { rankdir: 'TB' })
+      expect(Array.isArray(r.nodes)).toBe(true)
+      expect(Array.isArray(r.edges)).toBe(true)
+      expect(Array.isArray(r.clusters)).toBe(true)
+      expect(r.width).toBeGreaterThan(0)
+      expect(r.height).toBeGreaterThan(0)
+    })
+
+    it('positions every leaf with finite coords + positive size', async () => {
+      const r = await LayoutEngine.calculateLayout(entities, relations)
+      expect(r.nodes.length).toBeGreaterThan(0)
+      for (const n of r.nodes) {
+        expect(Number.isFinite(n.x)).toBe(true)
+        expect(Number.isFinite(n.y)).toBe(true)
+        expect(n.width).toBeGreaterThan(0)
+        expect(n.height).toBeGreaterThan(0)
+      }
+    })
+
+    it('emits clusters for parents and resolves the full hierarchy', async () => {
+      const r = await LayoutEngine.calculateLayout(entities, relations)
+      const ids = new Set([...r.nodes, ...r.clusters].map(n => n.id))
+      // Every entity (leaf and container) is laid out — parity invariant.
+      for (const a of ['SYS1', 'CONT1', 'COMP1', 'SYS2']) {
+        expect(ids.has(a), `${a} not laid out`).toBe(true)
+      }
+      expect(r.clusters.map(c => c.id).sort()).toEqual(['CONT1', 'SYS1'])
+    })
+
+    it('a child sits inside its parent cluster box (absolute top-left)', async () => {
+      const r = await LayoutEngine.calculateLayout(entities, relations)
+      const cont = r.clusters.find(c => c.id === 'CONT1')!
+      const comp = r.nodes.find(n => n.id === 'COMP1')!
+      // ELK hierarchical layout guarantees containment; assert it exactly.
+      expect(comp.x!).toBeGreaterThanOrEqual(cont.x!)
+      expect(comp.y!).toBeGreaterThanOrEqual(cont.y!)
+      expect(comp.x! + comp.width).toBeLessThanOrEqual(cont.x! + cont.width)
+      expect(comp.y! + comp.height).toBeLessThanOrEqual(cont.y! + cont.height)
+    })
+
+    it('keeps every relation as an edge with both endpoints', async () => {
+      const r = await LayoutEngine.calculateLayout(entities, relations)
+      const rel = r.edges.find(e => e.source === 'COMP1' && e.target === 'SYS2')
+      expect(rel, 'relation COMP1->SYS2 missing').toBeDefined()
+    })
+
+    it('handles empty input and a single childless entity', async () => {
+      const empty = await LayoutEngine.calculateLayout([], [])
+      expect(empty.nodes).toEqual([])
+      const one = await LayoutEngine.calculateLayout(
+        [{ type: 'Component', alias: 'X', label: 'X' }], [])
+      expect(one.nodes.map(n => n.id)).toEqual(['X'])
+    })
+
+    it('also works via the instance path (addNodes → calculateLayout)', async () => {
+      const e = new LayoutEngine()
+      e.addNodes([{ type: 'System', alias: 'A', label: 'A' }, { type: 'System', alias: 'B', label: 'B' }])
+      e.addEdges([{ source: 'A', target: 'B', label: 'r', description: '' }])
+      const r = await e.calculateLayout()
+      expect(r.nodes.map(n => n.id).sort()).toEqual(['A', 'B'])
+      expect(r.edges.some(x => x.source === 'A' && x.target === 'B')).toBe(true)
+    })
+  })
+
+  describe('L1 directional intent', () => {
+    // Containers → the diagram is hierarchical → the `layered` path (where
+    // directional intent applies). Context-level (people/systems only) is
+    // routed to `force`, which is intentionally non-directional.
+    const two = [
+      { type: 'Container', alias: 'a', label: 'a' },
+      { type: 'Container', alias: 'b', label: 'b' }
+    ]
+    const at = (r: Awaited<ReturnType<typeof LayoutEngine.calculateLayout>>, id: string) =>
+      [...r.nodes, ...r.clusters].find(n => n.id === id)!
+
+    it('Rel_U places the target above the source (smaller y)', async () => {
+      const r = await LayoutEngine.calculateLayout(
+        two, [{ source: 'a', target: 'b', label: 'up', description: '', direction: 'U' }])
+      // Rel_U(a,b): b is up relative to a → b.y < a.y.
+      expect(at(r, 'b').y!).toBeLessThan(at(r, 'a').y!)
+    })
+
+    it('default (no direction) places the target below the source (larger y)', async () => {
+      const r = await LayoutEngine.calculateLayout(
+        two, [{ source: 'a', target: 'b', label: 'down', description: '' }])
+      expect(at(r, 'b').y!).toBeGreaterThan(at(r, 'a').y!)
+    })
+
+    // Honest L/R contract: a Rel_L/Rel_R STILL emits an a→b edge, so a
+    // layered engine (ELK, dagre, and PlantUML's own Graphviz/dot) ranks
+    // a and b in DIFFERENT layers — "b left/right of a" is geometrically
+    // impossible for edge-connected nodes. L/R is fed as ELK
+    // considerModelOrder *influence* for the cases where it is meaningful
+    // (same-rank peers); it is not a guarantee and must not break layout.
+    // Asserting a strict x-order here would be a false claim.
+    it('Rel_L/Rel_R are accepted, keep parity, and still rank by the edge', async () => {
+      for (const d of ['L', 'R'] as const) {
+        const r = await LayoutEngine.calculateLayout(
+          two, [{ source: 'a', target: 'b', label: d, description: '', direction: d }])
+        expect(r.nodes.map(n => n.id).sort()).toEqual(['a', 'b'])
+        expect(r.edges.some(e => e.source === 'a' && e.target === 'b')).toBe(true)
+        // edge-connected → still different ranks (b below a in TB).
+        expect(at(r, 'b').y!).toBeGreaterThan(at(r, 'a').y!)
+      }
+    })
+  })
+
+  describe('setLayoutOptions affects the layout', () => {
+    it('rankdir LR orients horizontally vs TB vertically', async () => {
+      // Containers → hierarchical → layered path (rankdir applies there;
+      // Context/force is non-directional by design).
+      const ents = [
+        { type: 'Container', alias: 'p', label: 'p' },
+        { type: 'Container', alias: 'q', label: 'q' }
+      ]
+      const rels = [{ source: 'p', target: 'q', label: 'r', description: '' }]
+      const tb = await LayoutEngine.calculateLayout(ents, rels, { rankdir: 'TB' })
+      const lr = await LayoutEngine.calculateLayout(ents, rels, { rankdir: 'LR' })
+      const dy = (g: typeof tb) => Math.abs(
+        [...g.nodes].find(n => n.id === 'q')!.y! - [...g.nodes].find(n => n.id === 'p')!.y!)
+      const dx = (g: typeof lr) => Math.abs(
+        [...g.nodes].find(n => n.id === 'q')!.x! - [...g.nodes].find(n => n.id === 'p')!.x!)
+      // TB: the rank gap is vertical; LR: it becomes horizontal.
+      expect(dy(tb)).toBeGreaterThan(dx(tb))
+      expect(dx(lr)).toBeGreaterThan(dy(lr))
+    })
+  })
+
+  describe('addLayoutConstraints (Lay_*)', () => {
+    it('accepts a layout-only constraint and still lays out every node', async () => {
+      const ents = [
+        { type: 'System', alias: 'm', label: 'm' },
+        { type: 'System', alias: 'n', label: 'n' }
+      ]
+      const r = await LayoutEngine.calculateLayout(
+        ents, [], { rankdir: 'TB' }, [{ source: 'm', target: 'n', direction: 'D' }])
+      expect(r.nodes.map(n => n.id).sort()).toEqual(['m', 'n'])
+      // Lay_* must NOT become a drawn relation edge.
+      expect(r.edges.every(e => /^lay\d+$/.test(e.name ?? '') || /^rel\d+$/.test(e.name ?? ''))).toBe(true)
+      expect(r.edges.some(e => /^rel\d+$/.test(e.name ?? ''))).toBe(false) // no visible rels here
     })
   })
 })
