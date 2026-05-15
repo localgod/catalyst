@@ -4,177 +4,176 @@
   <img src="logo.svg" width="100" height="100" alt="Catalyst Logo">
 </div>
 
-[![CI](https://github.com/AndriyKalashnykov/catalyst/actions/workflows/ci.yml/badge.svg)](https://github.com/AndriyKalashnykov/catalyst/actions/workflows/ci.yml)
+[![CI](https://github.com/AndriyKalashnykov/catalyst/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndriyKalashnykov/catalyst/actions/workflows/ci.yml)
+[![Hits](https://hits.sh/github.com/AndriyKalashnykov/catalyst.svg?view=today-total&style=plastic)](https://hits.sh/github.com/AndriyKalashnykov/catalyst/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE)
 
-> **Project status:** independently maintained. This project originated as a
-> fork of [localgod/catalyst](https://github.com/localgod/catalyst) (MIT) but
-> has substantially diverged — most notably the layout engine was replaced
-> (dagre → elkjs), with real font-metric node sizing, spec-driven algorithm
-> selection, and structural parity/snapshot test gates. It is **not** tracking
+JavaScript/TypeScript library that converts C4 diagrams written in PlantUML
+C4 syntax (`.puml`) into [draw.io](https://draw.io) XML — no PlantUML runtime
+required. The **consumer surface** is a one-call API
+(`Catalyst.convert(puml, options)`) plus `parseEntities` / `parseRelations`,
+installed as a git dependency. The **engine surface** uses
+[elkjs](https://github.com/kieler/elkjs) (Eclipse Layout Kernel) with
+spec-driven algorithm selection — `layered` for hierarchical C4
+(Container/Component/Deployment), `force` for hub-and-spoke Context — real
+font-metric node sizing, and structural-parity + golden-snapshot +
+layout-quality test gates.
+
+> **Project status:** independently maintained. Originated as a fork of
+> [localgod/catalyst](https://github.com/localgod/catalyst) (MIT) but has
+> substantially diverged — the layout engine was replaced (dagre → elkjs),
+> with real font-metric sizing, spec-driven algorithm selection, and
+> structural parity/snapshot/layout-quality gates. It does **not** track
 > upstream (which is inactive); upstream attribution is retained in
-> [LICENSE](LICENSE).
+> [LICENSE](LICENSE). Not published to npm — consumed as a git dependency.
 
-## Overview
-
-Catalyst is a JavaScript library designed to facilitate the conversion of
-C4 diagrams written in [PlantUML](https://plantuml.com/) format into [draw.io](https://draw.io)
-C4 diagrams. While PlantUML itself is not required as a runtime dependency,
-the library parses diagrams written in PlantUML's C4 syntax (.puml files).
-This project uses the ELK (elkjs) layout engine: a layered algorithm for
-hierarchical C4 diagrams (Container/Component/Deployment) and a force
-algorithm for hub-and-spoke Context diagrams, selected per the C4 spec
-level of the source.
-
-## Installation
-
-Install Catalyst as a dependency in your project:
-
-```bash
-npm install catalyst
+```mermaid
+flowchart LR
+  P[".puml<br/>(PlantUML C4 syntax)"] --> A["Catalyst.convert()"]
+  subgraph A[" "]
+    direction LR
+    PR[parse entities + relations] --> EL["ELK layout<br/>(layered / force)"] --> MX[emit draw.io XML]
+  end
+  A --> D[".drawio"]
 ```
 
-## Requirements
+## Tech Stack
 
-- [NodeJS](https://nodejs.org) (ES2024+ support)
+| Component | Technology |
+|-----------|-----------|
+| Language | TypeScript 5.8, ES2024 (`.mts` ESM) |
+| Runtime | Node.js (ES2024+) |
+| Layout engine | elkjs (Eclipse Layout Kernel) — `layered` + `force` |
+| Text metrics | fontkit + bundled Liberation Sans (SIL OFL) |
+| Serialization | xml2js |
+| Tests | Vitest — unit, structural parity, golden snapshot, layout quality |
+| Lint | oxlint, markdownlint |
+| Visual proof | PlantUML jar + `rlespinasse/drawio-export` (via `make render-compare`) |
 
-## Input Format
+## Quick Start
 
-Catalyst processes C4 diagrams written in PlantUML syntax (.puml files). While the PlantUML
-runtime is not required, the input files should follow PlantUML's C4 diagram syntax including:
+This library is consumed as a **git dependency** (it is not on the npm
+registry). Pin a tag:
 
-- `System()`, `Container()`, `Component()` declarations
-- `Rel()` relationship definitions
-- Standard PlantUML C4 includes and formatting
+```bash
+# add to a project (npm resolves it under the package name "catalyst")
+npm install github:AndriyKalashnykov/catalyst#v1.3.0
 
-Example input file structure:
+# development of catalyst itself
+make deps      # npm ci
+make build     # compile TypeScript -> dist/
+make test      # full vitest suite (unit + parity + golden + layout-quality)
+```
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+## Prerequisites
 
-System(systemA, "System A", "Description")
-Container(containerA, "Container A", "Technology", "Description")
-Component(componentA, "Component A", "Technology", "Description")
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [Node.js](https://nodejs.org/) | ES2024+ | Runtime and build |
+| [GNU Make](https://www.gnu.org/software/make/) | 3.81+ | Build orchestration |
+| [Git](https://git-scm.com/) | latest | Dependency resolution (git install) |
+| [Docker](https://www.docker.com/) | latest | `make render-compare` only (drawio-export) |
+| [Java](https://adoptium.net/) | 17+ | `make render-compare` only (PlantUML render) |
 
-Rel(systemA, containerA, "Uses")
-@enduml
+```bash
+make deps
 ```
 
 ## Usage
-
-### Basic Usage
 
 ```javascript
 import { Catalyst } from 'catalyst'
 import fs from 'fs'
 
-// Read PlantUML content
-const pumlContent = await fs.promises.readFile('diagram.puml', 'utf-8')
-
-// Convert to draw.io XML
-const drawioXml = await Catalyst.convert(pumlContent)
-
-// Save the result
+const puml = await fs.promises.readFile('diagram.puml', 'utf-8')
+const drawioXml = await Catalyst.convert(puml)
 await fs.promises.writeFile('output.drawio', drawioXml)
 ```
 
-### Advanced Usage with Options
+Layout options (all optional; defaults shown):
 
 ```javascript
-import { Catalyst } from 'catalyst'
-
-const drawioXml = await Catalyst.convert(pumlContent, {
-  layoutDirection: 'LR',  // 'TB', 'BT', 'LR', 'RL'
-  nodesep: 50,           // Node separation
-  edgesep: 10,           // Edge separation
-  ranksep: 50,           // Rank separation
-  marginx: 20,           // X margin
-  marginy: 20            // Y margin
+const drawioXml = await Catalyst.convert(puml, {
+  layoutDirection: 'TB',  // 'TB' | 'BT' | 'LR' | 'RL'
+  nodesep: 50,            // node separation (px)
+  edgesep: 10,            // edge separation (px)
+  ranksep: 50,            // rank separation (px)
+  marginx: 20,
+  marginy: 20
 })
 ```
 
-### Utility Methods
+Parse-only helpers:
 
 ```javascript
-// Parse entities only
-const entities = Catalyst.parseEntities(pumlContent)
-
-// Parse relations only
-const relations = Catalyst.parseRelations(pumlContent)
+const entities  = Catalyst.parseEntities(puml)   // EntityDescriptor[]
+const relations = Catalyst.parseRelations(puml)   // { source, target, label, ... }[]
 ```
 
-## Try it out
+Input is standard PlantUML C4 syntax — `Person()`, `System()`, `Container()`,
+`Component()`, `Deployment_Node()`, boundaries, and the full `Rel`/`BiRel`/
+`Lay_*` surface. Pin the C4-PlantUML include to a tagged release:
 
-- Checkout this repo
-- Run `npm install` to install dependencies
-- Run `npm run build` to compile the library
-- Run `npm run example` to test the sample usage
+```plantuml
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
 
-The sample output is written to `sample/output.drawio`.
+System(systemA, "System A", "Description")
+Container(containerA, "Container A", "Technology", "Description")
+Rel(systemA, containerA, "Uses")
+@enduml
+```
 
-## Purpose
+Coverage of the full C4-PlantUML surface is tracked in
+[`docs/C4-COVERAGE.md`](docs/C4-COVERAGE.md).
 
-### Bridging Standards
+## Layout engine
 
-PlantUML C4 format and draw.io are widely used diagramming approaches, each with unique
-strengths. While PlantUML C4 format excels in creating architectural diagrams using textual
-descriptions, draw.io offers a more visual and intuitive diagramming
-experience. This project seeks to bridge the gap between these two approaches,
-allowing users to harness the power of both tools without requiring PlantUML runtime.
+elkjs is selected per the **C4 spec level** of the source (a semantic fact,
+not a heuristic):
 
-### Supporting C4 Modelling
+- **Container / Component / Deployment** (hierarchical) → `org.eclipse.elk.layered`
+  — layered flow, orthogonal routed connectors, native compound nesting.
+- **Context** (people/systems only — hub-and-spoke) → `org.eclipse.elk.force`
+  — balanced placement (a Context overview is not a flow diagram; a layered
+  engine, including PlantUML's own Graphviz/dot, spreads a star into a wide
+  ribbon).
 
-The primary goal of this project is to support the [C4](https://c4model.com)
-modelling standard. C4 (Context, Containers, Components, and Code) is a popular
-architectural modeling approach for visualizing and documenting software
-architecture. By enabling the conversion of PlantUML C4 diagrams to draw.io,
-this library facilitates the adoption of C4 modelling by providing a smooth
-transition from PlantUML's text-based format to draw.io's graphical capabilities.
+Node sizes are measured from the real label font (fontkit + bundled
+Liberation Sans), floored at the conventional C4 element-box size so rendered
+shapes never cram. Directional intent: `Rel_U/D` honored on the layered path;
+`Rel_L/R` honored when nodes share a rank (cross-rank L/R is not expressible
+in any layered engine).
 
-## Key Features
+## Available Make Targets
 
-- **PlantUML C4 Format Support:** The library parses and converts C4 diagrams
-written in PlantUML syntax (.puml files) without requiring PlantUML runtime.
+Run `make help` to list targets.
 
-- **ELK Layout Engine:** Uses elkjs (Eclipse Layout Kernel) — layered for
-hierarchical diagrams, force for Context-level hub-and-spoke diagrams —
-with real font-metric node sizing and routed connectors.
+| Target | Description |
+|--------|-------------|
+| `make deps` | Install dependencies (`npm ci`) |
+| `make build` | Compile TypeScript → `dist/` |
+| `make lint` | `oxlint src/` |
+| `make test` | Full Vitest suite (unit + parity + golden + layout-quality) |
+| `make golden-update` | Regenerate draw.io structural snapshots after an intentional change |
+| `make render-compare` | Visual proof: render source `.puml` and the catalyst `.drawio` side by side (requires Java + Docker) |
+| `make ci` | Local CI pipeline (build + lint + test) |
 
-- **draw.io Integration:** The resulting draw.io diagrams are seamlessly
-integrated with draw.io's native features, allowing users to further enhance and
-refine their diagrams.
+## CI/CD
 
-## Getting Started
+GitHub Actions (`🔨CI`, `.github/workflows/ci.yml`) runs on every push,
+pull request, and `workflow_dispatch`:
 
-1. **Installation:** Install the library using npm:
+| Job | Steps |
+|-----|-------|
+| **lint** | `oxlint` + `markdownlint` |
+| **test** | Full Vitest suite with coverage (85% thresholds) |
 
-   ```bash
-   npm install catalyst
-   ```
+No repository secrets or variables are required (`GITHUB_TOKEN` only).
+`release-drafter` maintains a draft release; the package is git-consumed,
+not npm-published.
 
-2. **Usage:** Import and use the library in your project:
-
-   ```javascript
-   import { Catalyst } from 'catalyst'
-   const drawioXml = await Catalyst.convert(pumlContent)
-   ```
-
-3. **Documentation:** Refer to the documentation for detailed instructions on how to use
-the converter. Examples and usage scenarios are provided to assist you.
-
-4. **Contribute:** We welcome contributions from the community. Feel free to
-submit bug reports, feature requests, or pull requests on our GitHub repository.
-
-## Testing and Coverage
-
-The project includes comprehensive test coverage with automated reporting:
-
-- **Run tests:** `npm run test:run`
-- **Run with coverage:** `npm run test:coverage`
-- **Coverage thresholds:** 85% for branches, functions, lines, and statements
-- **Automated coverage reports** are generated on every PR via GitHub Actions
-
-### Verifying conversions (parity, snapshots, visual proof)
+## Verifying conversions (parity, snapshots, visual proof)
 
 PlantUML and draw.io use different layout engines, so a rendered `.puml` and
 the converted `.drawio` are **never pixel-identical** even for a perfect
@@ -189,51 +188,26 @@ conversion. Correctness is therefore guaranteed structurally, not visually:
   `<diagram id+name>` is present. Loss fails the build.
 - **Drawio structural snapshot** (`tests/golden.test.mjs`) — a deterministic,
   same-engine regression gate (committed fingerprints under `tests/golden/`).
-  Regenerate intentional changes with `npm run golden:update`.
+  Regenerate intentional changes with `make golden-update`.
 - **Layout quality** (`tests/layout-quality.test.mts`) — every leaf shape is
   at least the conventional C4 element-box size for its type and no two leaf
   shapes overlap, so the rendered diagram does not cram. Catches under-sizing
-  that the structural gates (coordinate-independent by design) cannot.
-- **Visual proof** (`npm run render-compare` / `make render-compare`) — renders
-  the source `.puml` (PlantUML) and the catalyst `.drawio` (drawio-export)
-  side by side for human review. Requires `java` + `docker`; **not** a CI gate.
+  the structural gates (coordinate-independent by design) cannot.
+- **Visual proof** (`make render-compare`) — renders the source `.puml`
+  (PlantUML) and the catalyst `.drawio` (drawio-export) side by side for
+  human review. Requires Java + Docker; **not** a CI gate.
 
 Current: **181 tests** across unit, parity, golden-snapshot and
 layout-quality suites; 85% coverage thresholds enforced in CI.
 
-## Why Convert?
+## Contributing
 
-### Flexibility and Collaboration
-
-- **Textual vs. Visual:** PlantUML C4 format allows you to describe diagrams using text,
-which can be convenient for version control and collaboration. However, draw.io
-offers a more visual and interactive approach, making it easier to create
-complex diagrams.
-
-- **Team Collaboration:** Converting PlantUML diagrams to draw.io format can
-enhance team collaboration. Team members can work on diagrams using the
-user-friendly draw.io interface, even if they are not familiar with PlantUML.
-
-### C4 Modelling Adoption
-
-- **C4 Modelling:** C4 is a widely adopted standard for software architecture
-modeling. By supporting C4 modelling in draw.io, this converter facilitates the
-adoption of this powerful approach.
-
-- **Better Visualization:** draw.io's graphical capabilities enable the creation
-of more visually appealing and informative C4 diagrams, enhancing the
-communication of architectural concepts.
+Contributions welcome — open a PR or an issue.
 
 ## License
 
-This project is released under the [MIT License](LICENSE). You are free to use,
-modify, and distribute the software as per the terms of the license. It
-originated from [localgod/catalyst](https://github.com/localgod/catalyst);
-the original copyright and license terms are retained in [LICENSE](LICENSE).
-The bundled Liberation Sans fonts (used for text measurement) are under the
-SIL Open Font License 1.1 — see [src/assets/fonts/LICENSE](src/assets/fonts/LICENSE).
-
-## Feedback and Support
-
-If you have any questions, feedback, or encounter issues with the converter,
-please open an issue.
+Released under the [MIT License](LICENSE). This project originated from
+[localgod/catalyst](https://github.com/localgod/catalyst); the original
+copyright and license terms are retained in [LICENSE](LICENSE). The bundled
+Liberation Sans fonts (used for text measurement) are under the SIL Open
+Font License 1.1 — see [src/assets/fonts/LICENSE](src/assets/fonts/LICENSE).
