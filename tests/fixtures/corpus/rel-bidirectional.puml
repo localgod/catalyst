@@ -1,0 +1,10 @@
+@startuml rel-bidirectional
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Relationships — bidirectional
+System(a, "Service A")
+System(b, "Service B")
+System(c, "Service C")
+BiRel(a, b, "syncs with", "gRPC")
+Rel(a, c, "calls", "REST")
+Rel(c, a, "callbacks", "webhook")
+@enduml

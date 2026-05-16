@@ -1,0 +1,13 @@
+@startuml level-component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Component.puml
+title C4 Level — Component
+Container_Boundary(api, "API Application") {
+  Component(ctrl, "Order Controller", "Spring MVC", "Handles HTTP order endpoints")
+  Component(svc, "Order Service", "Spring Bean", "Order business rules")
+  Component(repo, "Order Repository", "Spring Data JPA", "Persistence")
+  ComponentDb(cache, "Order Cache", "Redis", "Hot order lookups")
+}
+Rel(ctrl, svc, "uses")
+Rel(svc, repo, "reads/writes", "JPA")
+Rel(svc, cache, "caches", "Lettuce")
+@enduml

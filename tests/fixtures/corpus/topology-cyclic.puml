@@ -1,0 +1,10 @@
+@startuml topology-cyclic
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Context.puml
+title Topology — cyclic (A→B→C→A)
+System(a, "Scheduler")
+System(b, "Executor")
+System(c, "Reconciler")
+Rel(a, b, "enqueues")
+Rel(b, c, "reports to")
+Rel(c, a, "requeues")
+@enduml

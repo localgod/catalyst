@@ -1,0 +1,60 @@
+<mxfile version="20.1.4" type="atlas">
+  <diagram id="catalyst-diagram" name="Page-1">
+    <mxGraphModel pageHeight="321" pageWidth="1074">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <object placeholders="1" c4Name="Acme Corp" c4Type="Enterprise_Boundary" c4Technology="" c4Description="" label="&lt;div style=&quot;font-weight:bold;font-size:13px;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div style=&quot;font-size:11px;&quot;&gt;[%c4Type%]&lt;/div&gt;" id="ent">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;labelBackgroundColor=none;strokeColor=#444444;strokeWidth=2;fillColor=none;fontColor=#222222;align=center;verticalAlign=top;fontSize=13;metaEdit=1;resizable=1;container=1;collapsible=0" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="221" width="974" x="50" y="50"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="Platform" c4Type="System_Boundary" c4Technology="" c4Description="" label="&lt;div style=&quot;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div style=&quot;font-size:11px;&quot;&gt;[%c4Type%]&lt;/div&gt;" id="plat">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;dashed=1;labelBackgroundColor=none;strokeColor=#666666;fillColor=none;fontColor=#333333;align=center;verticalAlign=top;fontStyle=0;fontSize=12;metaEdit=1;resizable=1;container=1;collapsible=0" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="194" width="721" x="299" y="73"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="Core Services" c4Type="System_Boundary" c4Technology="" c4Description="" label="&lt;div style=&quot;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div style=&quot;font-size:11px;&quot;&gt;[%c4Type%]&lt;/div&gt;" id="core">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;dashed=1;labelBackgroundColor=none;strokeColor=#666666;fillColor=none;fontColor=#333333;align=center;verticalAlign=top;fontStyle=0;fontSize=12;metaEdit=1;resizable=1;container=1;collapsible=0" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="167" width="468" x="548" y="96"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="Auth" c4Type="System" c4Technology="" c4Description="OIDC provider" label="&lt;div style=&quot;font-size:16px;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;div style=&quot;font-size:11px;color:#cccccc;&quot;&gt;%c4Description%&lt;/div&gt;" id="auth">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1061B0;fontColor=#ffffff;align=center;verticalAlign=top;arcSize=10;strokeColor=#0D5091;metaEdit=1;resizable=1" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="140" width="220" x="552" y="119"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="Users" c4Type="System" c4Technology="" c4Description="Profile store" label="&lt;div style=&quot;font-size:16px;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;div style=&quot;font-size:11px;color:#cccccc;&quot;&gt;%c4Description%&lt;/div&gt;" id="usr">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1061B0;fontColor=#ffffff;align=center;verticalAlign=top;arcSize=10;strokeColor=#0D5091;metaEdit=1;resizable=1" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="140" width="220" x="792" y="119"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="API Gateway" c4Type="System" c4Technology="" c4Description="" label="&lt;div style=&quot;font-size:16px;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;div style=&quot;font-size:11px;color:#cccccc;&quot;&gt;%c4Description%&lt;/div&gt;" id="gw">
+          <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1061B0;fontColor=#ffffff;align=center;verticalAlign=top;arcSize=10;strokeColor=#0D5091;metaEdit=1;resizable=1" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="140" width="220" x="303" y="119"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="Platform Admin" c4Type="Person" c4Technology="" c4Description="" label="&lt;div style=&quot;font-size:16px;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;div style=&quot;font-size:11px;color:#cccccc;&quot;&gt;%c4Description%&lt;/div&gt;" id="admin">
+          <mxCell style="shape=mxgraph.c4.person2;align=center;html=1;labelBackgroundColor=none;fillColor=#08427B;fontColor=#ffffff;strokeColor=#073B6F;verticalAlign=top;whiteSpace=wrap;metaEdit=1;resizable=1" parent="1" vertex="1">
+            <mxGeometry as="geometry" height="140" width="220" x="54" y="119"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="operates" c4Type="Relationship" c4Technology="" c4Description="" label="&lt;div style=&quot;text-align: center;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div style=&quot;text-align: center;&quot;&gt;%c4Technology%&lt;/div&gt;">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=10;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;metaEdit=1;endSize=14;startSize=14;jumpStyle=arc;jumpSize=16;rounded=0;edgeStyle=orthogonalEdgeStyle" parent="1" edge="1" source="admin" target="gw">
+            <mxGeometry as="geometry" relative="1"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="delegates" c4Type="Relationship" c4Technology="" c4Description="" label="&lt;div style=&quot;text-align: center;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div style=&quot;text-align: center;&quot;&gt;%c4Technology%&lt;/div&gt;">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=10;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;metaEdit=1;endSize=14;startSize=14;jumpStyle=arc;jumpSize=16;rounded=0;edgeStyle=orthogonalEdgeStyle" parent="1" edge="1" source="gw" target="auth">
+            <mxGeometry as="geometry" relative="1"/>
+          </mxCell>
+        </object>
+        <object placeholders="1" c4Name="looks up" c4Type="Relationship" c4Technology="" c4Description="" label="&lt;div style=&quot;text-align: center;font-weight:bold;&quot;&gt;%c4Name%&lt;/div&gt;&lt;div style=&quot;text-align: center;&quot;&gt;%c4Technology%&lt;/div&gt;">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=10;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;metaEdit=1;endSize=14;startSize=14;jumpStyle=arc;jumpSize=16;rounded=0;edgeStyle=orthogonalEdgeStyle" parent="1" edge="1" source="auth" target="usr">
+            <mxGeometry as="geometry" relative="1"/>
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

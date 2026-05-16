@@ -172,10 +172,22 @@ describe('EntityParser', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('should handle system with technology only', () => {
+  it('maps System 3rd positional arg to description (C4 grammar: System has no technology)', () => {
     const input = 'System(system1, "System 1", "Java")';
     const result = parser.parse(input);
-    
+
+    expect(result).toHaveLength(1);
+    // System(alias, label, ?descr) — the 3rd arg is the DESCRIPTION, not
+    // technology. The old assertion (technology='Java') encoded the
+    // mis-mapping bug that dropped Person/System descriptions.
+    expect(result[0].description).toBe('Java');
+    expect(result[0].technology).toBeUndefined();
+  });
+
+  it('maps Container 3rd positional arg to technology (C4 grammar: Container has technology)', () => {
+    const input = 'Container(c1, "C 1", "Java")';
+    const result = parser.parse(input);
+
     expect(result).toHaveLength(1);
     expect(result[0].technology).toBe('Java');
     expect(result[0].description).toBeUndefined();

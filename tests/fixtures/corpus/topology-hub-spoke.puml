@@ -1,0 +1,17 @@
+@startuml topology-hub-spoke
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Context.puml
+title Topology — hub & spoke (fan-out / force-layout case)
+System(hub, "Event Bus", "Central broker")
+System(s1, "Orders")
+System(s2, "Billing")
+System(s3, "Inventory")
+System(s4, "Shipping")
+System(s5, "Notifications")
+System(s6, "Analytics")
+Rel(s1, hub, "publishes")
+Rel(s2, hub, "publishes")
+Rel(s3, hub, "publishes")
+Rel(hub, s4, "routes to")
+Rel(hub, s5, "routes to")
+Rel(hub, s6, "routes to")
+@enduml

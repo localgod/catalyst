@@ -120,7 +120,13 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
     for (const tag of (rel.tags ?? '').split('+').map(s => s.trim()).filter(Boolean)) {
       if (styles.relTags.has(tag)) Object.assign(relOvr, styles.relTags.get(tag))
     }
-    await mx.addMxC4Relationship(g, rel.source, rel.target, 'Relationship', rel.label, undefined, rel.description, rel.bidirectional === true, Object.keys(relOvr).length ? relOvr : undefined)
+    // C4-PlantUML grammar: Rel(from, to, "verb", ?"technology"). The parser
+    // names group 5 `label` (the verb shown bold, -> c4Name) and group 6
+    // `description` (which is semantically the *technology*, shown bracketed
+    // -> c4Technology). Passing rel.description as the `technology` arg fixes
+    // the swapped-field bug where the verb landed in unused c4Name and the
+    // template rendered the technology bold + an empty "[]".
+    await mx.addMxC4Relationship(g, rel.source, rel.target, 'Relationship', rel.label, rel.description, undefined, rel.bidirectional === true, Object.keys(relOvr).length ? relOvr : undefined)
     if (!emittedIds.has(rel.source) || !emittedIds.has(rel.target)) {
       // Not silently swallowed: an unresolved endpoint means the puml
       // referenced an alias that never produced a shape. Surface it so the

@@ -1,0 +1,9 @@
+@startuml edge-unicode-specialchars
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Edge cases — Unicode & special chars
+Person(u, "Ünïcödé Üser 日本語", "Ñame with áccénts & symbols")
+System(s, "Café <Backend>", "Handles <angle> & ampersand input")
+System(q, "Queue™", "Δelta · 50% load")
+Rel(u, s, "submits «request»", "HTTPS & TLS")
+Rel(s, q, "→ enqueue ←", "AMQP/0.9.1")
+@enduml

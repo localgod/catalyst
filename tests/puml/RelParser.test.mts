@@ -212,3 +212,33 @@ describe('RelParser — directional intent (L1)', () => {
     expect(RelParser.getLayoutConstraints('Rel(a, b, "x")')).toEqual([]);
   });
 });
+describe('RelParser — RelIndex leading-index + numeric-alias safety (7-a)', () => {
+  it('RelIndex($index, $from, $to, $label) discards the index, keeps from/to', () => {
+    const rels = RelParser.getRelations('RelIndex(1, user, web, "opens")');
+    expect(rels).toHaveLength(1);
+    expect(rels[0]).toMatchObject({ source: 'user', target: 'web', label: 'opens' });
+  });
+
+  it('RelIndex 5-arg keeps technology (group 6)', () => {
+    const rels = RelParser.getRelations('RelIndex(2, web, api, "GET /orders", "JSON/HTTPS")');
+    expect(rels[0]).toMatchObject({ source: 'web', target: 'api', label: 'GET /orders', description: 'JSON/HTTPS' });
+  });
+
+  it('RelIndex_* directional variant also discards the leading index', () => {
+    const rels = RelParser.getRelations('RelIndex_Back(3, a, b, "x")');
+    expect(rels[0]).toMatchObject({ source: 'a', target: 'b', label: 'x' });
+  });
+
+  it('plain Rel with a numeric leading argument is NOT treated as a RelIndex index', () => {
+    // Pathological but legal: a node literally aliased "12". The lookbehind
+    // gate means only RelIndex* consumes a leading integer.
+    const rels = RelParser.getRelations('Rel(12, b, "x")');
+    expect(rels).toHaveLength(1);
+    expect(rels[0]).toMatchObject({ source: '12', target: 'b', label: 'x' });
+  });
+
+  it('BiRel with a numeric leading alias keeps it as the source', () => {
+    const rels = RelParser.getRelations('BiRel(99, target, "syncs")');
+    expect(rels[0]).toMatchObject({ source: '99', target: 'target', label: 'syncs', bidirectional: true });
+  });
+});

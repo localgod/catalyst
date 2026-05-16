@@ -1,0 +1,11 @@
+@startuml edge-empty-descriptions
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Edge cases — labels only, no descriptions/technology
+Person(u, "User")
+System(a, "Service A")
+System(b, "Service B")
+Container(c, "Worker")
+Rel(u, a, "uses")
+Rel(a, b, "calls")
+Rel(b, c, "queues")
+@enduml

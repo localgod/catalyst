@@ -8,6 +8,7 @@ class EntityParser {
   /** Restore `\u0001Q<n>\u0001` placeholders produced by parse() back to their original strings. */
   private restoreQuoted(s: string | undefined): string | undefined {
     if (s === undefined) return undefined;
+    // eslint-disable-next-line no-control-regex -- U+0001 is the intentional load-bearing sentinel for quote-strip placeholders from parse(), not text input
     return s.replace(/\u0001Q(\d+)\u0001/g, (_, n) => this.quoted[parseInt(n, 10)] ?? '');
   }
 
@@ -50,6 +51,22 @@ class EntityParser {
       'Deployment_Node_L',
       'Deployment_Node_R',
     ].indexOf(type) !== -1 ? true : false
+  }
+
+  /**
+   * C4-PlantUML procedures whose 3rd positional argument is the
+   * *description* (these have no technology parameter). Everything else
+   * with a 3rd positional arg treats it as technology / node-type.
+   * Ref: C4_Context.puml — Person(alias,label,?descr), System(alias,label,?descr)
+   * and their Db/Queue/_Ext variants.
+   */
+  private takesDescriptionAsThirdArg(type: string): boolean {
+    return [
+      'Person', 'Person_Ext',
+      'System', 'System_Ext',
+      'SystemDb', 'SystemDb_Ext',
+      'SystemQueue', 'SystemQueue_Ext',
+    ].indexOf(type) !== -1;
   }
 
   private isComponent(str: string): boolean {
@@ -153,7 +170,18 @@ class EntityParser {
         result.description = this.restoreQuoted(positional[3]);
         break;
       case 3:
-        result.technology = this.restoreQuoted(positional[2]);
+        // C4-PlantUML grammar diverges on the 3rd positional arg:
+        //   Person*/System*  -> Person(a,label,?descr) / System(a,label,?descr)
+        //                       — NO technology param; 3rd arg is DESCRIPTION.
+        //   Container*/Component*/Node* -> 3rd arg is technology (or, for
+        //                       Deployment_Node, the node $type) shown bracketed.
+        // Treating it unconditionally as technology dropped Person/System
+        // descriptions (the Person label template renders only %c4Description%).
+        if (this.takesDescriptionAsThirdArg(typeName)) {
+          result.description = this.restoreQuoted(positional[2]);
+        } else {
+          result.technology = this.restoreQuoted(positional[2]);
+        }
         break;
       default:
         break;

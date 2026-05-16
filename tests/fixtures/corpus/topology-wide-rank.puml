@@ -1,0 +1,21 @@
+@startuml topology-wide-rank
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Context.puml
+title Topology — wide rank (ribbon stress)
+System(src, "API Gateway")
+System(w1, "Worker 1")
+System(w2, "Worker 2")
+System(w3, "Worker 3")
+System(w4, "Worker 4")
+System(w5, "Worker 5")
+System(w6, "Worker 6")
+System(w7, "Worker 7")
+System(w8, "Worker 8")
+Rel(src, w1, "dispatch")
+Rel(src, w2, "dispatch")
+Rel(src, w3, "dispatch")
+Rel(src, w4, "dispatch")
+Rel(src, w5, "dispatch")
+Rel(src, w6, "dispatch")
+Rel(src, w7, "dispatch")
+Rel(src, w8, "dispatch")
+@enduml

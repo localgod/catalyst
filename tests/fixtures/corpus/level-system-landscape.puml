@@ -1,0 +1,17 @@
+@startuml level-system-landscape
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Context.puml
+title C4 Level — System Landscape
+Enterprise_Boundary(e, "Retailer") {
+  Person(cust, "Customer", "Buys products")
+  Person(staff, "Support Staff", "Handles tickets")
+  System(shop, "E-Shop", "Storefront")
+  System(crm, "CRM", "Customer records")
+  System(wms, "Warehouse", "Fulfilment")
+}
+System_Ext(pay, "Payment Gateway", "Third-party processor")
+Rel(cust, shop, "browses & buys")
+Rel(staff, crm, "manages tickets")
+Rel(shop, pay, "charges", "HTTPS")
+Rel(shop, wms, "requests fulfilment")
+Rel(shop, crm, "updates profile")
+@enduml
