@@ -1,5 +1,6 @@
 import { EntityDescriptor } from '../puml/EntityDescriptor.interface.mjs'
 import { textWidth, lineHeight, spaceAdvance, wrap } from '../text/TextMetrics.mjs'
+import { splitLabelLines } from '../text/labelLines.mjs'
 
 /**
  * Text-measured leaf-node size (L3). Sizes a shape to its rendered label
@@ -16,22 +17,28 @@ export function measureNode(entity: EntityDescriptor): { width: number; height: 
   const TITLE_PX = 16, BODY_PX = 11
   const pad = spaceAdvance(TITLE_PX, true)            // font-derived padding unit
 
-  const titleW = textWidth(entity.label ?? entity.alias, TITLE_PX, true)
+  // Title may carry explicit PlantUML `\n` breaks — measure each rendered
+  // line, the box must fit the WIDEST and stack ALL of them vertically.
+  const titleLines = splitLabelLines(entity.label ?? entity.alias)
+  const titleW = titleLines.reduce(
+    (m, l) => Math.max(m, textWidth(l, TITLE_PX, true)), 0)
   const meta = entity.technology
     ? `[${entity.type}: ${entity.technology}]`
     : `[${entity.type}]`
   const metaW = textWidth(meta, BODY_PX, false)
 
   const contentW = Math.max(titleW, metaW)
-  const descLines = entity.description
-    ? wrap(entity.description, Math.max(contentW, 1), BODY_PX, false)
-    : []
+  // Honour explicit breaks first, then word-wrap each segment to the box
+  // width. An intentionally-blank segment (`a\n\nb`) keeps a real empty
+  // line so its vertical space is reserved.
+  const descLines = splitLabelLines(entity.description).flatMap((seg) =>
+    seg.trim() === '' ? [''] : wrap(seg, Math.max(contentW, 1), BODY_PX, false))
   const longestDescW = descLines.reduce(
     (m, l) => Math.max(m, textWidth(l, BODY_PX, false)), 0)
 
   const textW = Math.ceil(Math.max(titleW, metaW, longestDescW) + 2 * pad)
   const textH = Math.ceil(
-    lineHeight(TITLE_PX, true) +                       // title
+    titleLines.length * lineHeight(TITLE_PX, true) +   // title (1+ lines)
     lineHeight(BODY_PX, false) +                       // meta
     descLines.length * lineHeight(BODY_PX, false) +    // wrapped description
     2 * pad)                                           // top/bottom breathing

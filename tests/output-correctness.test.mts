@@ -73,3 +73,35 @@ describe('Bug 2 — fail loudly, never a content-less stub', () => {
     await expect(xml2js.parseStringPromise(xml)).resolves.toBeDefined();
   });
 });
+
+describe('Phase 1 — PlantUML \\n becomes a real line break, never a literal', () => {
+  it('translates \\n in name/description/rel to <br/> and stays strict-XML well-formed', async () => {
+    const xml = await Catalyst.convert(C4('C4_Container.puml',
+      'ContainerDb(s, "K8s Secret\\n<workload>-tls", "Kubernetes", "Holds the issued\\nleaf cert\\nand key")\n'
+      + 'Container(a, "Admin API", "Go", "OpenAPI 3.1 REST:\\n  POST /issue")\n'
+      + 'Rel(a, s, "writes\\ncert + key to", "K8s API")'));
+
+    // Strict-XML well-formed (the inserted break must be the pre-encoded
+    // &lt;br/&gt;, not a raw <br/> that a strict consumer would reject).
+    const doc = await xml2js.parseStringPromise(xml);
+    expect(doc).toBeDefined();
+    expect(xml).toContain('&lt;br/&gt;');
+
+    // No literal backslash-n survives in any catalyst-authored attribute.
+    for (const m of xml.matchAll(/c4(?:Name|Technology|Description)="([^"]*)"/g)) {
+      expect(m[1], `literal \\n survived in ${m[0]}`).not.toMatch(/\\n/);
+    }
+
+    // After the XML round-trip the value carries a real <br/> at each break
+    // (draw.io substitutes this into the html=1 label).
+    const root = doc.mxfile.diagram[0].mxGraphModel[0].root[0];
+    const objs = (root.object ?? []) as { $: Record<string, string> }[];
+    const byId = (id: string) => objs.find((o) => o.$.id === id)!.$;
+    expect(byId('s').c4Name).toBe('K8s Secret<br/><workload>-tls');
+    expect(byId('s').c4Description).toBe('Holds the issued<br/>leaf cert<br/>and key');
+    expect(byId('a').c4Description).toBe('OpenAPI 3.1 REST:<br/>  POST /issue');
+    // Relationship verb keeps its break too.
+    const rel = objs.find((o) => o.$.c4Name?.includes('writes'))!.$;
+    expect(rel.c4Name).toBe('writes<br/>cert + key to');
+  });
+});

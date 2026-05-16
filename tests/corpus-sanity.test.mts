@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import xml2js from 'xml2js';
 import { Catalyst } from '../src/catalyst.mjs';
 import type { EntityDescriptor } from '../src/puml/EntityParser.mjs';
+import { splitLabelLines } from '../src/text/labelLines.mjs';
 
 /**
  * Per-fixture STRUCTURAL SANITY GATE for the use-case corpus.
@@ -130,12 +131,26 @@ describe('corpus structural sanity gate', () => {
       }
 
       // 5. Description preservation (bug #3): an entity that declared a
-      //    description must keep it in the emitted node.
+      //    description must keep it in the emitted node. PlantUML `\n`
+      //    breaks are intentionally translated to `<br/>` (Phase 1 layout
+      //    fix) — normalise the expectation the same way so "not dropped"
+      //    still holds without forbidding the line-break translation.
       for (const ent of entities) {
         if (ent.description && ent.description.trim().length > 0) {
           const node = nodes.get(ent.alias);
           expect(node, `${name}: entity "${ent.alias}" emitted`).toBeDefined();
-          expect(node!.c4Description, `${name}: entity "${ent.alias}" keeps its description`).toBe(ent.description);
+          const expected = splitLabelLines(ent.description).join('<br/>');
+          expect(node!.c4Description, `${name}: entity "${ent.alias}" keeps its description`).toBe(expected);
+        }
+      }
+
+      // 6. PlantUML `\n` line breaks must NOT survive as a literal "\n" in
+      //    any emitted label — they must become a `<br/>` (Phase 1). The
+      //    raw XML carries the pre-encoded `&lt;br/&gt;`; what must never
+      //    appear is a backslash-n inside a c4* attribute value.
+      for (const node of nodes.values()) {
+        for (const v of [node.c4Name, node.c4Description, node.c4Technology]) {
+          expect(v, `${name}: no literal \\n survives in emitted label`).not.toMatch(/\\n/);
         }
       }
     });

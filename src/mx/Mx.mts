@@ -22,6 +22,7 @@ import { DeploymentNode } from './c4/DeploymentNode.mjs';
 import { Relastionship } from './c4/Relationship.mjs';
 import { StyleParser } from '../puml/StyleParser.mjs';
 import type { StyleOverride } from '../puml/StyleParser.mjs';
+import { htmlBreaks } from '../text/labelLines.mjs';
 
 /**
  * xml2js escapes `&`, `<`, `"` in attribute values but leaves `>` raw
@@ -33,6 +34,15 @@ import type { StyleOverride } from '../puml/StyleParser.mjs';
  * `&gt;`. Applied to catalyst-authored c4* text attributes only.
  */
 const escGt = (s: string): string => s.replace(/>/g, '&gt;')
+
+/**
+ * Canonical encoder for every catalyst-authored c4* text attribute:
+ * escape `>` (escGt), THEN turn PlantUML `\n` breaks into a pre-encoded
+ * `&lt;br/&gt;` (htmlBreaks). Order matters — htmlBreaks must run on the
+ * `>`-escaped string so the inserted break token survives escGt untouched
+ * and the surrounding text's real `>` is still encoded.
+ */
+const c4Text = (s: string): string => htmlBreaks(escGt(s))
 
 class Mx {
     doc: MxFile
@@ -194,10 +204,10 @@ class Mx {
         const t: c4 = {
             $: {
                 placeholders: 1,
-                c4Name: escGt(name),
+                c4Name: c4Text(name),
                 c4Type,
-                c4Technology: escGt(technology || ''),
-                c4Description: escGt(description || ''),
+                c4Technology: c4Text(technology || ''),
+                c4Description: c4Text(description || ''),
                 label,
                 id: alias,
                 ...(link ? { link } : {})
@@ -231,14 +241,14 @@ class Mx {
         const t: c4 = {
             $: {
                 placeholders: 1,
-                c4Name: escGt(name),
+                c4Name: c4Text(name),
                 c4Type: type,
                 // Pre-bracket the technology in the VALUE so the label template
                 // (which is just `%c4Technology%`, no literal brackets) renders
                 // "[HTTPS]" when present and an empty <div> when absent — never
                 // a bare "[]" tofu box. See Relastionship.label().
-                c4Technology: technology ? escGt(`[${technology}]`) : '',
-                c4Description: escGt(description || ''),
+                c4Technology: technology ? c4Text(`[${technology}]`) : '',
+                c4Description: c4Text(description || ''),
                 label: await Relastionship.label()
             },
             MxCell: {
