@@ -8,6 +8,8 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-05-16
+
 ### Changed
 
 - Replaced the dagre layout engine with elkjs (Eclipse Layout Kernel).
