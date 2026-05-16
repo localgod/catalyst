@@ -280,6 +280,28 @@ Rel(a, b, "submits a payment authorization request and waits synchronously for s
 
 </details>
 
+### `rel-parallel-duplicate.puml`
+
+| Source PlantUML | catalyst → draw.io |
+|---|---|
+| ![rel-parallel-duplicate source](img/rel-parallel-duplicate.puml.png) | ![rel-parallel-duplicate drawio](img/rel-parallel-duplicate.drawio.png) |
+
+<details><summary>PlantUML source</summary>
+
+```plantuml
+@startuml rel-parallel-duplicate
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Relationships — parallel duplicates + antiparallel (lane separation)
+System(a, "Service A")
+System(b, "Service B")
+Rel(a, b, "sync", "REST")
+Rel(a, b, "async", "Kafka")
+Rel_Back(b, a, "callback", "webhook")
+@enduml
+```
+
+</details>
+
 ### `rel-tech-vs-notech.puml`
 
 | Source PlantUML | catalyst → draw.io |

@@ -3,6 +3,7 @@ import { Mx, MxGeometry } from './mx/Mx.mjs'
 import { MxPoint } from './mx/MxPoint.mjs'
 import { RelParser } from './puml/RelParser.mjs'
 import { LayoutEngine, LayoutResult } from './layout/LayoutEngine.mjs'
+import { assignEdgeLanes, type NodeCenter } from './layout/edgeLanes.mjs'
 import { StyleParser } from './puml/StyleParser.mjs'
 import type { ParsedStyles, StyleOverride } from './puml/StyleParser.mjs'
 
@@ -71,6 +72,9 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
 
   // Leaf shapes on top. Pass every valid C4 type through — Mx.addMxC4's
   // switch decides the shape/style.
+  // Centre of every emitted leaf box, keyed by alias — used below to fan
+  // same-node-pair edge groups into distinct lanes.
+  const nodeCenter = new Map<string, NodeCenter>()
   if (layoutData.nodes && Array.isArray(layoutData.nodes)) {
     for (const node of layoutData.nodes) {
       const g = new MxGeometry(node.height, node.width, node.x, node.y)
@@ -79,6 +83,11 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
       if (info) {
         await mx.addMxC4(node.id, g, info.type, info.label, info.technology, info.description, undefined, overrideFor(info.type, info.tags, styles), info.link)
         emittedIds.add(node.id)
+        const nx = node.x ?? 0, ny = node.y ?? 0
+        nodeCenter.set(node.id, {
+          cx: nx + node.width / 2, cy: ny + node.height / 2,
+          hw: node.width / 2, hh: node.height / 2,
+        })
       }
     }
   }
@@ -106,12 +115,35 @@ async function layoutData2mx(layoutData: LayoutResult, pumlElements: EntityDescr
   // would not match the visible boundary endpoints — let drawio auto-route.
   const clusterIds = new Set<string>((layoutData.clusters ?? []).map(c => c.id))
 
+  // Multi-edge lane separation — see src/layout/edgeLanes.mts for the why.
+  const edgeLanes = assignEdgeLanes(pumlRelations, nodeCenter, (id) => clusterIds.has(id))
+
   for (let i = 0; i < pumlRelations.length; i++) {
     const rel = pumlRelations[i]
     const g = new MxGeometry()
     g.$.relative = 1
+    const lane = edgeLanes.get(i)
     const poly = layoutEdgeByRelIdx.get(i)
-    if (poly && poly.length > 2 && !clusterIds.has(rel.source) && !clusterIds.has(rel.target)) {
+    if (lane) {
+      if (poly && poly.length > 2 && !clusterIds.has(rel.source) && !clusterIds.has(rel.target)) {
+        // ELK produced a real obstacle-aware polyline for this laned edge —
+        // preserve its bends, just shift each interior point into the lane
+        // (rather than discarding the route for a single midpoint waypoint).
+        for (const p of poly.slice(1, -1)) {
+          g.addArrayPoint(new MxPoint(
+            Math.round(p.x + lane.perp.x * lane.shift),
+            Math.round(p.y + lane.perp.y * lane.shift),
+          ))
+        }
+      } else {
+        // Common case (per spike: ELK returns straight 2-point sections for
+        // adjacent same-pair edges) — synthesize the lane midpoint waypoint.
+        g.addArrayPoint(new MxPoint(lane.waypoint.x, lane.waypoint.y))
+      }
+      // Fan the label off the shared midpoint via an absolute offset mxPoint
+      // (drawio-export honors this; it ignores the geometry.x fraction).
+      g.addPoint(new MxPoint(lane.labelOffset.dx, lane.labelOffset.dy, 'offset'))
+    } else if (poly && poly.length > 2 && !clusterIds.has(rel.source) && !clusterIds.has(rel.target)) {
       for (const p of poly.slice(1, -1)) {
         g.addArrayPoint(new MxPoint(Math.round(p.x), Math.round(p.y)))
       }

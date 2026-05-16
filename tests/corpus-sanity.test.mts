@@ -39,7 +39,9 @@ function flatten(entities: EntityDescriptor[]): EntityDescriptor[] {
 }
 
 interface EmittedNode { id: string; c4Name: string; c4Description: string; c4Technology: string }
-interface EmittedEdge { source: string; target: string; c4Name: string }
+/** `route` = waypoint coords + label offset — the visible path signature. Two
+ *  edges between the same node pair with an identical signature would overlap. */
+interface EmittedEdge { source: string; target: string; c4Name: string; route: string }
 
 /**
  * Parse the emitted draw.io XML via a real XML parser (not a regex — a raw
@@ -63,7 +65,11 @@ async function parseXml(xml: string): Promise<{ nodes: Map<string, EmittedNode>;
         c4Technology: o.c4Technology ?? '',
       });
     } else if (cell.edge === '1') {
-      edges.push({ source: cell.source, target: cell.target, c4Name: o.c4Name ?? '' });
+      const geo = obj.mxCell?.[0]?.mxGeometry?.[0] ?? {};
+      const wps = (geo.Array?.[0]?.mxPoint ?? []).map((p: { $: { x: string; y: string } }) => `${p.$.x},${p.$.y}`).join(';');
+      const off = (geo.mxPoint ?? []).find((p: { $: { as?: string } }) => p.$?.as === 'offset')?.$ ?? {};
+      const route = `wp[${wps}]|off(${off.x ?? ''},${off.y ?? ''})`;
+      edges.push({ source: cell.source, target: cell.target, c4Name: o.c4Name ?? '', route });
     }
   }
   return { nodes, edges, raw: xml };
@@ -105,6 +111,22 @@ describe('corpus structural sanity gate', () => {
         expect(pairs.has(`${e.source}->${e.target}`), `${name}: edge ${e.source}->${e.target} matches a PUML relation (not reversed/swapped)`).toBe(true);
         // 4. Relationship verb always present (bug #2: verb was lost to c4Name-unused).
         expect(e.c4Name.trim().length, `${name}: edge ${e.source}->${e.target} has a non-empty verb`).toBeGreaterThan(0);
+      }
+
+      // 4b. Multi-edge lane separation (finding #9): every edge in a
+      //     same-node-pair group (antiparallel OR parallel duplicates) must
+      //     have a DISTINCT visible path — identical waypoint+label signatures
+      //     would render collinear with stacked labels.
+      const byPair = new Map<string, string[]>();
+      for (const e of edges) {
+        const key = [e.source, e.target].sort().join('|');
+        const arr = byPair.get(key) ?? [];
+        arr.push(e.route);
+        byPair.set(key, arr);
+      }
+      for (const [key, routes] of byPair) {
+        if (routes.length < 2) continue;
+        expect(new Set(routes).size, `${name}: ${routes.length} edges between pair ${key} must have distinct routes (no collinear overlap)`).toBe(routes.length);
       }
 
       // 5. Description preservation (bug #3): an entity that declared a

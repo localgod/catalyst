@@ -1,0 +1,9 @@
+@startuml rel-parallel-duplicate
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/v2.10.0/C4_Container.puml
+title Relationships — parallel duplicates + antiparallel (lane separation)
+System(a, "Service A")
+System(b, "Service B")
+Rel(a, b, "sync", "REST")
+Rel(a, b, "async", "Kafka")
+Rel_Back(b, a, "callback", "webhook")
+@enduml
