@@ -25,6 +25,14 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 - Enhanced catalyst.mts with better layout integration
 - package.json configured for ES modules with proper exports and type definitions
 - TypeScript configuration optimized for library builds
+- Relationship connectors no longer hardcode `entryX/entryY`/`elbow`; the
+  orthogonal router picks the attach side from geometry, so routing is
+  direction-agnostic (TB/BT/LR/RL) instead of forcing a left-side dog-leg.
+- System-family label template renders `[%c4Type%]` (C4 `System` has no
+  technology parameter — no stray `[System:]`).
+- `make lint` and the `make ci` lint step now also run `markdownlint`,
+  matching the CI `lint` job (previously the local pipeline never checked
+  markdown, so a CI-only markdownlint failure could ship).
 
 ### Added
 
@@ -38,6 +46,18 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 - Sample usage scripts in `./sample/` folder
 - TypeScript declaration files for better IDE support
 - Centered logo display in README
+- Use-case corpus (`tests/fixtures/corpus/`, 19 fixtures): topology
+  shapes, relationship variants, C4 levels, edge cases.
+- Per-fixture structural sanity gate (`tests/corpus-sanity.test.mts`):
+  well-formed XML, no dropped entity, every relation an edge with
+  resolved endpoints in the PUML direction, non-empty verb, no `[]`
+  artifact, descriptions preserved, distinct routes for same-pair edges.
+- `src/layout/edgeLanes.mts`: pure, unit-tested multi-edge lane
+  separator (`tests/edge-lanes.test.mts`).
+- Dual-render gallery: `make gallery` / `scripts/gallery.mjs` →
+  `docs/gallery/` (source `.puml` vs catalyst `.drawio`, indexed README).
+- RelParser unit tests for `RelIndex` / numeric-alias safety.
+- `markdownlint-cli` pinned as an exact devDependency.
 
 ### Removed
 
@@ -53,3 +73,21 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 - Test suite compatibility with new layout system
 - Logo rendering issue in GitHub README
 - Test suite updated to work with new library API
+- Relationship label lost the verb and rendered an empty `[]` when there
+  was no technology; the verb is now shown bold with the technology
+  bracketed below it (and omitted entirely when absent).
+- `Person`/`System` (and `_Ext`/`Db`/`Queue` variants) descriptions were
+  dropped: their 3rd positional argument is the *description*, not a
+  technology — now preserved.
+- `RelIndex($index, $from, $to, …)` produced zero edges (the leading
+  index was mis-parsed); now parsed, with the leading index consumed
+  only for `RelIndex*` so a numeric source alias on a plain
+  `Rel`/`BiRel` is not mistaken for an index.
+- Emitted XML could be invalid: a literal `&` in a label/description was
+  un-escaped to a bare `&`; only genuinely double-encoded entity refs
+  are now reversed.
+- Antiparallel (`Rel`+`Rel_Back`) and parallel-duplicate relations
+  between the same node pair rendered collinear with stacked, unreadable
+  labels; each is now fanned onto its own lane (perpendicular waypoint +
+  offset label). ELK's obstacle-aware polyline is preserved when it has
+  real bends.

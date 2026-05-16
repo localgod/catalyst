@@ -46,9 +46,9 @@ flowchart LR
 | Layout engine | elkjs (Eclipse Layout Kernel) — `layered` + `force` |
 | Text metrics | fontkit + bundled Liberation Sans (SIL OFL) |
 | Serialization | xml2js |
-| Tests | Vitest — unit, structural parity, golden snapshot, layout quality |
-| Lint | oxlint, markdownlint |
-| Visual proof | PlantUML jar + `rlespinasse/drawio-export` (via `make render-compare`) |
+| Tests | Vitest — unit, structural parity, golden snapshot, layout quality, corpus sanity |
+| Lint | oxlint + markdownlint (pinned `markdownlint-cli` devDependency) |
+| Visual proof | PlantUML jar + `rlespinasse/drawio-export` (via `make render-compare` / `make gallery`) |
 
 ## Quick Start
 
@@ -145,6 +145,15 @@ shapes never cram. Directional intent: `Rel_U/D` honored on the layered path;
 `Rel_L/R` honored when nodes share a rank (cross-rank L/R is not expressible
 in any layered engine).
 
+Relationship rendering: the verb is shown bold with the technology
+bracketed below it (an absent technology yields no `[]` artifact); entity
+descriptions are preserved for every C4 element (including `Person`/`System`,
+which have no technology parameter); `RelIndex(...)` dynamic relations are
+parsed. When two or more relations connect the **same node pair**
+(antiparallel `Rel`+`Rel_Back` or parallel duplicates), each is fanned onto
+its own lane — a perpendicular waypoint plus an offset label — so connectors
+and labels never render collinear or stacked.
+
 ## Available Make Targets
 
 Run `make help` to list targets.
@@ -153,11 +162,12 @@ Run `make help` to list targets.
 |--------|-------------|
 | `make deps` | Install dependencies (`npm ci`) |
 | `make build` | Compile TypeScript → `dist/` |
-| `make lint` | `oxlint src/` |
-| `make test` | Full Vitest suite (unit + parity + golden + layout-quality) |
+| `make lint` | `oxlint src/` + `markdownlint` (parity with CI's lint job) |
+| `make test` | Full Vitest suite (unit + parity + golden + layout-quality + corpus sanity) |
 | `make golden-update` | Regenerate draw.io structural snapshots after an intentional change |
-| `make render-compare` | Visual proof: render source `.puml` and the catalyst `.drawio` side by side (requires Java + Docker) |
-| `make ci` | Local CI pipeline (build + lint + test) |
+| `make render-compare` | Visual proof: render one source `.puml` and the catalyst `.drawio` side by side (requires Java + Docker) |
+| `make gallery` | Dual-render the whole use-case corpus into `docs/gallery/` (requires Java + Docker) |
+| `make ci` | Local CI pipeline — build + lint (oxlint + markdownlint) + test |
 
 ## CI/CD
 
@@ -193,12 +203,22 @@ conversion. Correctness is therefore guaranteed structurally, not visually:
   at least the conventional C4 element-box size for its type and no two leaf
   shapes overlap, so the rendered diagram does not cram. Catches under-sizing
   the structural gates (coordinate-independent by design) cannot.
-- **Visual proof** (`make render-compare`) — renders the source `.puml`
-  (PlantUML) and the catalyst `.drawio` (drawio-export) side by side for
-  human review. Requires Java + Docker; **not** a CI gate.
+- **Corpus sanity gate** (`tests/corpus-sanity.test.mts`) — for every fixture
+  in [`tests/fixtures/corpus/`](tests/fixtures/corpus/) (topology shapes,
+  relationship variants, C4 levels, edge cases): output is well-formed XML,
+  no entity dropped, every relation is an edge with resolved endpoints in the
+  PUML direction, the verb is non-empty, no `[]` artifact, descriptions are
+  preserved, and same-node-pair edges get distinct routes. Covers the label
+  text the golden fingerprint intentionally excludes.
+- **Visual proof** (`make render-compare`, `make gallery`) —
+  `render-compare` renders one source `.puml` and its `.drawio` side by side;
+  `make gallery` dual-renders the whole corpus into
+  [`docs/gallery/`](docs/gallery/) with an indexed README. Requires Java +
+  Docker; **not** a CI gate.
 
-Current: **181 tests** across unit, parity, golden-snapshot and
-layout-quality suites; 85% coverage thresholds enforced in CI.
+Current: **218 tests** across unit, parity, golden-snapshot,
+layout-quality, corpus-sanity and edge-lane suites; 85% coverage thresholds
+enforced in CI.
 
 ## Contributing
 
