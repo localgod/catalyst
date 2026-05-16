@@ -33,7 +33,6 @@
     "node_modules",
     "dist",
     "tests",
-    "sample",
-    "slides"
+    "sample"
   ]
 }

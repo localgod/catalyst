@@ -12,7 +12,7 @@
         "example": "cd sample && node example.mjs",
         "lint": "oxlint ./src",
         "lintfix": "oxlint --fix ./src",
-        "mdlint": "markdownlint '**/*.md' --ignore node_modules --ignore slides --disable MD033 MD013 MD041",
+        "mdlint": "markdownlint '**/*.md' --ignore node_modules --disable MD033 MD013 MD041",
         "test": "vitest",
         "test:run": "vitest run",
         "test:coverage": "vitest run --coverage",
