@@ -127,6 +127,14 @@ Rel(systemA, containerA, "Uses")
 Coverage of the full C4-PlantUML surface is tracked in
 [`docs/C4-COVERAGE.md`](docs/C4-COVERAGE.md).
 
+catalyst converts the **static C4 subset only** (Context / Container /
+Component / Deployment). The C4-PlantUML **dynamic/sequence** family
+(`C4_Sequence.puml`, `actor`/`participant` + message arrows / `==stage==`
+dividers) is **not** supported: `Catalyst.convert()` **throws** a clear
+error rather than emitting a content-less stub, so callers fail fast
+instead of generating blank artifacts. Likewise, any input that yields
+zero entities and zero relations is rejected.
+
 ## Layout engine
 
 elkjs is selected per the **C4 spec level** of the source (a semantic fact,

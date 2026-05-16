@@ -8,6 +8,8 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-05-16
+
 ### Removed
 
 - `release-drafter` workflow + config
@@ -19,6 +21,18 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 
 - README Quick Start install pin (`#v1.3.0` → `#v1.4.0`) — it was stale
   the moment v1.4.0 shipped and would have installed previous code.
+- Attribute values now also escape `>` → `&gt;` (in addition to the
+  `&`/`<`/`"` already escaped since v1.4.0) for `c4Name`/`c4Technology`/
+  `c4Description`. Raw `>` is legal XML but strict/non-conformant
+  consumers (e.g. rlespinasse/drawio-export's Rust parser) and the
+  round-trip contract want it escaped; an element named `A & B <C> "D"`
+  now round-trips through `xmllint --noout` and a strict parser.
+- C4-PlantUML **sequence/dynamic** input (`C4_Sequence.puml`,
+  `participant`/sequence message syntax) no longer silently produces a
+  valid-but-content-less `<mxGraphModel>` stub that renders as a blank
+  image downstream. `Catalyst.convert()` now throws a clear, specific
+  error; any input parsing to zero entities and zero relations is
+  likewise rejected rather than emitting a stub.
 
 ## [1.4.0] - 2026-05-16
 

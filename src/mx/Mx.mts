@@ -23,6 +23,17 @@ import { Relastionship } from './c4/Relationship.mjs';
 import { StyleParser } from '../puml/StyleParser.mjs';
 import type { StyleOverride } from '../puml/StyleParser.mjs';
 
+/**
+ * xml2js escapes `&`, `<`, `"` in attribute values but leaves `>` raw
+ * (legal per the XML spec, but strict/non-conformant consumers — e.g.
+ * rlespinasse/drawio-export's Rust parser — and the project's own
+ * round-trip contract want it escaped). Pre-encoding `>` -> `&gt;` here
+ * rides the existing double-encode/un-double pipeline in Mx.generate()
+ * (`&` -> `&amp;` by xml2js, then `&amp;gt;` -> `&gt;`), yielding a final
+ * `&gt;`. Applied to catalyst-authored c4* text attributes only.
+ */
+const escGt = (s: string): string => s.replace(/>/g, '&gt;')
+
 class Mx {
     doc: MxFile
 
@@ -183,10 +194,10 @@ class Mx {
         const t: c4 = {
             $: {
                 placeholders: 1,
-                c4Name: name,
+                c4Name: escGt(name),
                 c4Type,
-                c4Technology: technology || '',
-                c4Description: description || '',
+                c4Technology: escGt(technology || ''),
+                c4Description: escGt(description || ''),
                 label,
                 id: alias,
                 ...(link ? { link } : {})
@@ -220,14 +231,14 @@ class Mx {
         const t: c4 = {
             $: {
                 placeholders: 1,
-                c4Name: name,
+                c4Name: escGt(name),
                 c4Type: type,
                 // Pre-bracket the technology in the VALUE so the label template
                 // (which is just `%c4Technology%`, no literal brackets) renders
                 // "[HTTPS]" when present and an empty <div> when absent — never
                 // a bare "[]" tofu box. See Relastionship.label().
-                c4Technology: technology ? `[${technology}]` : '',
-                c4Description: description || '',
+                c4Technology: technology ? escGt(`[${technology}]`) : '',
+                c4Description: escGt(description || ''),
                 label: await Relastionship.label()
             },
             MxCell: {

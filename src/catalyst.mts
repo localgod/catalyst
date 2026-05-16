@@ -194,6 +194,32 @@ export class Catalyst {
     const layoutConstraints = RelParser.getLayoutConstraints(pumlContent)
     const styles = StyleParser.parse(pumlContent)
 
+    // Fail loudly instead of emitting a content-less stub. catalyst converts
+    // the STATIC C4 subset (Context/Container/Component/Deployment with
+    // Person/System/Container/Component/Node + Rel/BiRel/RelIndex). The
+    // C4-PlantUML *dynamic/sequence* flavor (C4_Sequence.puml, actor/
+    // participant + message arrows / ==stage== dividers) has no handler, so
+    // it would otherwise produce a valid-but-empty <mxGraphModel> that
+    // renders as a blank image downstream — a silent failure.
+    const seq = /^\s*!include\b.*\bC4_Sequence(?:\.puml)?\b/m.test(pumlContent)
+      || /^\s*participant\s+/m.test(pumlContent)
+    if (elements.length === 0 && relations.length === 0) {
+      if (seq) {
+        throw new Error(
+          'unsupported C4-PlantUML diagram type: C4_Sequence — catalyst '
+          + 'converts the static C4 subset only (Context / Container / '
+          + 'Component / Deployment). Sequence/dynamic-message diagrams are '
+          + 'not supported.',
+        )
+      }
+      throw new Error(
+        'no convertible C4 elements found — catalyst parsed zero entities '
+        + 'and zero relations from the input. Expected static C4-PlantUML '
+        + '(Person/System/Container/Component/Node + Rel/BiRel/RelIndex). '
+        + 'Refusing to emit a content-less draw.io stub.',
+      )
+    }
+
     const layoutOptions = {
       rankdir: options.layoutDirection || 'TB',
       nodesep: options.nodesep || 50,

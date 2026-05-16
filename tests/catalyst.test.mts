@@ -2,9 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
 
+// parse() returns ONE entity (not []) so the convert()-orchestration test
+// gets past the fail-loud guard (Catalyst.convert now throws on zero
+// entities + zero relations — see output-correctness.test.mts). The two
+// parse* tests below only assert Array-ness, so a non-empty default is fine.
 vi.mock('../src/puml/EntityParser.mjs', () => ({
   EntityParser: class MockEntityParser {
-    parse = vi.fn().mockReturnValue([])
+    parse = vi.fn().mockReturnValue([{ alias: 'sys1', type: 'System', label: 'System 1' }])
     getObjectWithPropertyAndValueInHierarchy = vi.fn().mockReturnValue(null)
   }
 }));
