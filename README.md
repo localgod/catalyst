@@ -180,8 +180,9 @@ pull request, and `workflow_dispatch`:
 | **test** | Full Vitest suite with coverage (85% thresholds) |
 
 No repository secrets or variables are required (`GITHUB_TOKEN` only).
-`release-drafter` maintains a draft release; the package is git-consumed,
-not npm-published.
+Releases are **git tags only** (`vX.Y.Z`) — no formal GitHub Releases;
+downstream consumers track tags via the `github-tags` datasource. The
+package is git-consumed, not npm-published.
 
 ## Verifying conversions (parity, snapshots, visual proof)
 

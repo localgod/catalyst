@@ -8,6 +8,18 @@ This project adheres to [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Removed
+
+- `release-drafter` workflow + config
+  (`.github/workflows/release-drafter.yml`, `.github/release-drafter.yml`).
+  Releases are git tags only (no formal GitHub Releases); the perpetual
+  auto-generated untagged Draft contradicted that documented convention.
+
+### Fixed
+
+- README Quick Start install pin (`#v1.3.0` → `#v1.4.0`) — it was stale
+  the moment v1.4.0 shipped and would have installed previous code.
+
 ## [1.4.0] - 2026-05-16
 
 ### Changed
