@@ -57,6 +57,6 @@
         "@vitest/coverage-v8": "^4.1.9",
         "oxlint": "^1.69.0",
         "unsplash-js": "^8.0.0",
-        "vitest": "^4.1.7"
+        "vitest": "^4.1.9"
     }
 }
